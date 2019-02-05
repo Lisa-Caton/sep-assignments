@@ -1,7 +1,8 @@
 def bucket_sort(collection)
   no_of_buckets = 10
   buckets = Array.new(no_of_buckets){Array.new}
-  divider = ((collection.max + 1)/no_of_buckets).ceil
+
+  #divider = ((collection.max + 1)/no_of_buckets).ceil
   divider = 9
 
   collection.each do |x|

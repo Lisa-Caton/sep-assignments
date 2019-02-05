@@ -7,8 +7,7 @@ require_relative 'bubbleSort'
 require_relative 'bucketSort'
 require_relative 'mergeSort'
 
-n = 50
-array = ["E", "C", "A", "B", "F", "G", "D"]
+array = [22, 45, 12, 8, 10, 6, 72, 81, 33, 18, 50, 14]
 
 #user = user CPU time
 #system = system CPU time
@@ -24,6 +23,7 @@ Benchmark.bm(50) do |x|
   x.report('merge sort:') { merge_sort(array) }
   x.report('bucket sort:') { bucket_sort(array) }
 end
+
 
 # -------------
 # Also Worked:
