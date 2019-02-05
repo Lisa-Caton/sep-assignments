@@ -21,8 +21,8 @@ Benchmark.bm(50) do |x|
   x.report('insertion sort:') { insertion_sort(array) }
   x.report('selection sort:') { selection_sort(array) }
   x.report('bubble sort:') { bubble_sort(array) }
-  x.report('bucket sort:') { bucket_sort(array) }
   x.report('merge sort:') { merge_sort(array) }
+  x.report('bucket sort:') { bucket_sort(array) }
 end
 
 # -------------
