@@ -7,7 +7,9 @@ require_relative 'bubbleSort'
 require_relative 'bucketSort'
 require_relative 'mergeSort'
 
-array = [22, 45, 12, 8, 10, 6, 72, 81, 33, 18, 50, 14]
+
+array = Array.new(50) { rand(1..1000) }
+array.sort
 
 #user = user CPU time
 #system = system CPU time
