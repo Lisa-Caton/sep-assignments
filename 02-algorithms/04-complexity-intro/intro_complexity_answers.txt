@@ -1,72 +1,105 @@
+Intro to Complexity answers:
+
 ------------------------
-Describe an analogy for relating an algorithm that has efficiency O(1) and another algorithm that has O(2n). An example would be:
+1. Describe an analogy for relating an algorithm that has efficiency O(1) and another algorithm that has O(2n). An example would be:
   An algorithm that has O(1) is a Cheetah and an algorithm that has O(2n) is a Snail.
-  In plain English, what is the best case scenario for binary search?
 ------------------------
-
-An analogy for constant of O(1) would be the best possible outcome iterating over each element once no matter the n size, n meaning the total number of elements in the array. 
-
-You could think of how hungry you get in a day. 
-Imagine there are 24 hours in a day, and just because there's a ton of hours in the day, doesn't mean you eat every hour. Let's just say you eat one big meal that would fill you up for the entire day, no matter how many hours are in a day.
-O(1) = 1
-"In the best-case scenario, the item we're looking for will be at the zero index."
-
-An analogy of O(2^n) would be running as "Big-O exponential time". Even though we may think exponential means faster in this case it actually means that this is slower than any other efficiencies. Thats like saying for evey hour in the day you would multiply it times 2 and then exponentially raise that snack amount to the total amount of hours.
-n = 24
-0(2^24)
-16,777,216
-
-------------------------
-In plain English, what is the worst-case scenario for binary search?
-------------------------
-
-Binary search runs in logarithmic time in the worst case, making O(log n) comparisons, where n is the number of elements in the array, the O is Big O notation, and log is the logarithm.
-As the size of n grows (n equals the total amount of elements), the time it takes the algorithm to execute and complete grows faster than constant time. This means that logarithmic time algorithms are slower than constant time algorithms. 
+  An analogy for constant of O(1) would be the best possible outcome iterating over each element once no matter the n-size, n meaning the total number of elements in the array. "In the best-case scenario, the item we're looking for will be at the zero index."
 
 
-------------------------
-In plain English, what is the bounded-case scenario for binary search?
-------------------------
+    ------------------------
+    1a. algorithm that has efficiency O(1)
+    ------------------------
 
+    You could think of how hungry you get in a day.
+    Imagine there are 24 hours in a day, and just because there's a ton of hours in the day, doesn't mean you eat every hour. Let's just say you eat one big meal that would fill you up for the entire day, no matter how many hours are in a day.
+    O(1) = 1
+
+
+    ------------------------
+    1b. algorithm that has efficiency O(2)
+    ------------------------
+
+    An analogy of O(2^n) would be running as "Big-O exponential time". Even though we may think exponential means faster in this case it actually means that it's a lot slower than any other efficiency. To use: O(2^n) to find the total amount of snacks for that particular hour would be to take that hour number and raising it exponentially, to the base 2!
+
+    1st hour:         10th hour:            24th hour:
+    n= 1              n = 10                n = 24
+    O(2^1)            O(2^10)               0(2^24)
+    2 snacks          1024 snacks!          16,777,216 snacks!!!!!!!!
 
 ------------------------
-Create a graph using the data below. Here's a CSV with the values you'll need.
+2. In plain English, what is the best case scenario for binary search?
 ------------------------
 
+  The best case scenario for any search would be finding our elementon the first iteration. O(1) is the best case for any scenario.
 
 ------------------------
-What is the limit of the function above as n approaches infinity?
+3. In plain English, what is the worst-case scenario for binary search?
 ------------------------
 
+  The worst case scenario is that the element was not even in the array. The algorithm would continue to execute, dividing the array in half, until eventually nothing was found.
 
 ------------------------
-What is the Big-O of an algorithm that has the data points above?
+3. In plain English, what is the bounded-case scenario for binary search?
 ------------------------
 
+  The bounded-case scenario for binary search would mean the average, not the best, and definately not the worst case scenario. This means that the element searched for would exist in the array, but that it wouldn't be the first searched element found.
 
 ------------------------
-Write a Ruby method that takes a number n. This method must print the worst-case number of iterations for linear search to find an item in collections of size one to n. Use it to generate a table of worst-case iterations of collections up to size 10.
+4. Create a graph using the data below. Here's a CSV with the values you'll need.
 ------------------------
 
+  >> https://docs.google.com/spreadsheets/d/1HYfjCtZDT59QIKCgBlH8kMfVpc3pA1XIDWO4UOHOnZk/edit?usp=sharing
 
 ------------------------
-Create a graph from the output using Google Sheets or other graphing software. Analyze the graph and denote its Big-O somewhere on the graph.
+5. What is the limit of the function above as n approaches infinity?
 ------------------------
 
+  As n approaches infinity, so does f(2^n).
 
 ------------------------
-What is the Big-O of binary search?
+6. What is the Big-O of an algorithm that has the data points above?
 ------------------------
 
+  Based on the data points, the Big-O notation for this is O(2^n).
 
 ------------------------
-What is the Big-Ω of binary search?
+7. Write a Ruby method that takes a number n. This method must print the worst-case number of iterations for linear search to find an item in collections of size one to n. Use it to generate a table of worst-case iterations of collections up to size 10.
 ------------------------
 
+  def searcher(array)
+      array.each_with_index do |value, index|
+        puts "x: #{index}, y: #{value}"
+      end
+    end
+
+  collection = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  searcher(collection)
 
 ------------------------
-What is the Big-Ө of binary search?
+8. Create a graph from the output using Google Sheets or other graphing software. Analyze the graph and denote its Big-O somewhere on the graph.
 ------------------------
 
+  >> https://docs.google.com/spreadsheets/d/1HYfjCtZDT59QIKCgBlH8kMfVpc3pA1XIDWO4UOHOnZk/edit?usp=sharing
 
+------------------------
+9. What is the Big-O of binary search? 
+------------------------
+Big-O | Worst Case:
+  O(log n)
+  "logarithmic time"
+
+------------------------
+10. What is the Big-Ω of binary search?
+------------------------
+Big-Omega | Best Case:
+  O(1)
+  "constant time"
+
+------------------------
+11. What is the Big-Ө of binary search?
+------------------------
+Big Theta | Bounded by the Best and Worst Case:
+  O(log n)
+  "logarithmic time"
 
