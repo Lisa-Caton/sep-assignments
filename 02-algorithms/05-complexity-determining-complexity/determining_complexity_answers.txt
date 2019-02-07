@@ -1,0 +1,221 @@
+----------------------------------
+
+1. What's the Big-O of the following algorithm? Submit your work and reasoning with your solution.
+
+  def goodbye_world(n)
+   puts "Goodbye World! #{n}"
+  end
+
+----------------------------------
+  Answer:
+----------------------------------
+
+  The Big-O is O(1) because this program takes the same amount of time to execute. We call this *constant*. Regardless of the size of (n), hello_world always prints the same element.
+
+----------------------------------
+
+2. What's the Big-O of the following algorithm? Submit your work and reasoning with your solution.
+
+  find_largest.rb
+  def find_largest(collection)
+   largest = collection[0]
+   collection.length.times do |i|
+     if collection[i] >= largest
+       largest = collection[i]
+     end
+   end
+   largest
+  end
+
+----------------------------------
+  Answer:
+----------------------------------
+
+  Showing Work:
+  repl.it | https://repl.it/@LisaCaton/findlargest?language=ruby&folderId=
+
+  Repeating these steps:
+    + find collection length
+    + grabs the number at that index
+    + holds on to the largest number
+    + continues through the array, finds next largest number
+    + continues through the array, finds next largest number
+    + continues through the array, finds next largest number
+
+  The Big-O for this method is of linear time complexity: O(n) because we **may** have to go through the entire collection length before getting to the largest number. As the number of elements grow, the number of operations it takes to execute also grows at the same rate.
+
+----------------------------------
+
+3. What's the Big-O of the following algorithm? Submit your work and reasoning with your solution.
+
+  find_largest_2D_array.rb
+  def find_largest(collection)
+   largest = collection[0][0]
+   collection.length.times do |i|
+     subcollection = collection[i]
+     subcollection.length.times do |j|
+       if subcollection[j] >= largest
+         largest = subcollection[j]
+       end
+     end
+   end
+   largest
+  end
+
+----------------------------------
+  Answer:
+----------------------------------
+
+  Showing Work:
+  https://repl.it/@LisaCaton/findlargest2Darray?language=ruby&folderId=
+
+  Repeating these steps:
+    + loop goes through the collection length
+    + and looks at both indexes in the 2D array
+    + then, grabs the the largest single number!!! 
+
+    Eventhough this is a 2D array the Big-O is still of linear time complexity: O(n). When showing my work in repl.it I found the method still runs through every single character in the array one by one. The bigger the collection, the longer it would take proportionally.
+
+----------------------------------
+
+4. What's the Big-O of the following algorithm? Submit your work and reasoning with your solution.
+
+  numbers_recurive.rb
+  def numbers(n)
+   if (n == 0)
+     return 0
+   elsif (n == 1)
+     return 1
+   else
+     return numbers(n-1) + numbers(n-2)
+   end
+  end
+
+----------------------------------
+  Answer:
+----------------------------------
+
+  Showing Work:
+  https://repl.it/@LisaCaton/numbersrecursive
+
+  #numbers(8) = 21
+    #8 |  7   +   6
+  #numbers(7) = 13
+    #7 |  6   +   5
+  #numbers(6) = 8
+    #6 |  5   +   4
+  #numbers(5) = 5
+    #5 |  4   +   3
+  #numbers(4) = 3
+    #4 |  3   +   2
+  #numbers(3) = 2
+    #3 |  2   +   1
+  #numbers(2) = 1
+    #2 |  1   +   0
+
+    This is the Fibonacci rule!!
+
+    The equation of (n-2) + (n-1) = a number, then you move on to the next number, which you take (n-1) and add (n+2) which happens to be the previous answer, and repeat the steps.
+
+    Big-O here is O(2^n) because for every recusion it calls itself twice.
+
+----------------------------------
+
+5. What's the Big-O of the following algorithm? Submit your work and reasoning with your solution.
+
+  numbers_iterative.rb
+  def iterative(n)
+   num1 = 0
+   num2 = 1
+
+   i = 0
+   while i < n-1
+     tmp = num1 + num2
+     num1 = num2
+     num2 = tmp
+     i+=1
+   end
+
+   num2
+  end
+
+----------------------------------
+  Answer:
+----------------------------------
+  Showing Work:
+  https://repl.it/@LisaCaton/numbersiterative
+
+  Big-O is O(n) because the method is dependent on the size of N. The method loops just once through the whole collection. n is increased by a constant amount each time it runs through the collection. The larger the collection, the longer it would take.
+
+----------------------------------
+
+6. What's the Big-O of the following algorithm? Submit your work and reasoning with your solution.
+
+  sort.rb
+  def sort(collection, from=0, to=nil)
+   if to == nil
+     # Sort the whole collection, by default
+     to = collection.count - 1
+   end
+
+   if from >= to
+     # Done sorting
+     return
+   end
+
+   # Take a pivot value, at the far left
+   pivot = collection[from]
+
+   # Min and Max pointers
+   min = from
+   max = to
+
+   # Current free slot
+   free = min
+
+   while min < max
+     if free == min # Evaluate collection[max]
+       if collection[max] <= pivot # Smaller than pivot, must move
+         collection[free] = collection[max]
+         min += 1
+         free = max
+       else
+         max -= 1
+       end
+     elsif free == max # Evaluate collection[min]
+       if collection[min] >= pivot # Bigger than pivot, must move
+         collection[free] = collection[min]
+         max -= 1
+         free = min
+       else
+         min += 1
+       end
+     else
+       raise "Inconsistent state"
+     end
+   end
+
+   collection[free] = pivot
+
+   sort collection, from, free - 1
+   sort collection, free + 1, to
+
+   collection
+  end
+
+----------------------------------
+  Answer:
+----------------------------------
+
+  It appears this is using quicksort, and recursively runs through itself repeatedly until completion and is dependent on the size of the collection. The average runtime for a sorted or nearly-sorted list is Big-O O(n^2) at its worst case.
+
+
+
+
+
+
+
+
+
+
+
