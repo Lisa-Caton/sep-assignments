@@ -1,0 +1,47 @@
+---------------------------
+Time complexity of each "improving algorithms"
+---------------------------
+
+1. The complexity of version 1 is O(n^2) because the algorithm uses nested loops.
+
+   #user     system      total        real
+   0.000000   0.000000   0.000000 (  0.000019)
+
+---------------------------
+
+2. The complexity of version 2 is O(n log n). After flattening, the Ruby Quicksort algorithm, 'Sort', is called.
+
+  + Is my reasoning for: O(n log n) even though Quicksort Big-O is: O(n^2)
+    http://bigocheatsheet.com/
+
+  + "It does natively use quicksort however, which is n log n complexity on average."
+    https://stackoverflow.com/questions/855773/which-algorithm-does-rubys-sort-method-use
+
+  #user     system      total        real
+   0.000000   0.000000   0.000000 (  0.000012)
+
+---------------------------
+
+3. The complexity of version 3 is O(n log n) because it uses a divide & conquer heapsort algorithm.
+
+   #user     system      total        real
+   0.000000   0.000000   0.000000 (  0.000023)
+
+---------------------------
+
+
+--------------------
+Faster
+--------------------
+1. Heap Sort----------O(n log n)---------------loglinear time
+2. Merge Sort---------O(n log n)---------------loglinear time
+
+
+--------------------
+Slower
+--------------------
+3. Bubble Sort--------O(n^2)-------------------quadratic time
+4. Bucket Sort--------O(n^2)-------------------quadratic time
+5. Insertion Sort-----O(n^2)-------------------quadratic time
+6. Quick Sort---------O(n^2)-------------------quadratic time
+7. Selection Sort-----O(n^2)-------------------quadratic time
