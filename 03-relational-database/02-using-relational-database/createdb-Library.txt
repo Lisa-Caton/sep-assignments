@@ -1,0 +1,25 @@
+Last login: Mon Feb 25 16:02:04 on ttys004
+lcaton-mbp:02-using-relational-database lcaton$ createdb -U postgres -w Library
+lcaton-mbp:02-using-relational-database lcaton$ psql -f library-data.sql Library postgres
+CREATE TABLE
+INSERT 0 4
+lcaton-mbp:02-using-relational-database lcaton$ psql Library postgres
+psql (10.4, server 11.2)
+WARNING: psql major version 10, server major version 11.
+         Some psql features might not work.
+Type "help" for help.
+
+Library=# SELECT * FROM books;
+  id  |                  title                   |       author        
+------+------------------------------------------+---------------------
+ 1259 | Eloquent Ruby                            | Russell A. Olson
+ 1593 | JavaScript: The Good Parts               | Douglas Crockford
+ 8982 | Designing Object-Oriented Software       | Rebecca Wirfs-Brock
+ 7265 | Practical Object-Oriented Design in Ruby | Sandi Metz
+ 1259 | Eloquent Ruby                            | Russell A. Olson
+ 1593 | JavaScript: The Good Parts               | Douglas Crockford
+ 8982 | Designing Object-Oriented Software       | Rebecca Wirfs-Brock
+ 7265 | Practical Object-Oriented Design in Ruby | Sandi Metz
+(8 rows)
+
+Library=# 
