@@ -1,0 +1,131 @@
+---------------------------------
+1. What data types do each of these values represent?
+---------------------------------
+
+  "A Clockwork Orange" -------- string/ text
+  42 -------------------------- integer
+  09/02/1945 ------------------ integer/ date
+  98.7 ------------------------ integer/ float
+  $15.99 ---------------------- integer/ numberic amount
+
+---------------------------------
+2. Explain in your own words when a database might be used. 
+   Explain when a text file might be used.
+---------------------------------
+  + You would use a databse if there was a need to store data. A database would allow easy searches on specific data, it could handle multiple applications accessing the data, and that persists beyond the end of a particular application process.
+
+  + You would use a text file if you had a small amount of data, for example, a file of JSON objects.
+
+---------------------------------
+3. Describe one difference between SQL and other programming languages.
+---------------------------------
+   + SQL is a declarative rather than a procedural language. This means we would not need to define an algorithm for how the database should search for the data, (for example using Ruby as a language); instead the database engine determines the most efficient way to return that data. 
+
+---------------------------------
+4. In your own words, explain how the pieces of a database system fit together at a high level.
+---------------------------------
+   + A database is a structured system that stores data and imposes rules upon that data. (For example, when dealing with: size, accuracy, security, redundancy, importance, and overwriting). And based on your needs, the importance of each of these aspects may change too. It's the things that you can't see in the background which makes the database robust and reliable to serve lots of people at the same time, and correctly survive crashes and hardware issues without corrupting the data. 
+   The database will have your actual data and the rules about that data. DBMS (Database Management System) is the program that surrounds and manages your actual data and it enforces the rules you specified on your data. 
+
+---------------------------------
+5. Explain the meaning of table, row, column, and value.
+---------------------------------
+   + Table -- most basic building of a database. It's where you put your data (aka entity), define their data type, and their relationship with the other tables.
+
+   + Row -- make-up a complete conceptual unit.
+
+   + Column -- define what the data represents.
+
+   + Value -- some piece of information that the column describes. 
+
+---------------------------------
+6. List 3 data types that can be used in a table.
+---------------------------------
+  + string
+  + integer
+  + object
+
+---------------------------------
+7. Given this payments table, provide an English description of the following queries and include their results:
+
+CREATE TABLE payments(
+  "date"   DATE,
+  "payee"  VARCHAR(32),
+  "amount" DECIMAL(13,4),
+  "memo"   TEXT
+);
+
+INSERT INTO payments
+  ("date",       "payee",                "amount", "memo")
+
+VALUES
+  ('2016-05-01', 'West Hill Apartments',  1500.00, 'Rent'),
+  ('2016-05-10', 'Best Toy Store',        37.00,   'Beanie Babies'),
+  ('2016-05-15', 'Mega Foods',            124.93,  'Groceries'),
+  ('2016-05-23', 'Shoes R Cool',          54.72,   'Athletic shoes');
+
+
+  SELECT date, amount
+  FROM payments;
+
+  SELECT amount
+  FROM payments
+  WHERE amount > 500;
+
+  SELECT *
+  FROM payments
+  WHERE payee = 'Mega Foods';
+---------------------------------
+
+  1a. I'm looking for the date and the amount of the payments.
+  1b. 2016-05-01 1500.00
+      2016-05-10 37.00
+      2016-05-15 124.93
+      2016-05-23 54.72
+
+  2a. I'm looking for the amount of the payments whose amount is greater than 500.
+  2b. 1500.00
+
+  3a. I'm looking for all of the columns for the set of rows that matches payee = 'Mega Foods'
+  3b. ('2016-05-15', 'Mega Foods', 124.93, 'Groceries')
+
+---------------------------------
+8. Given this users table, write SQL queries using the following criteria and include the output:
+
++ The email and sign-up date for the user named DeAndre Data.
++ The user ID for the user with email 'aleesia.algorithm@uw.edu'.
++ All the columns for the user ID equal to 4.
+
+CREATE TABLE users(
+  "userid" INTEGER,
+  "name"   VARCHAR(32),
+  "email"  VARCHAR(64),
+  "signup" DATE
+);
+
+INSERT INTO users
+    ("userid", "name",              "email",                        "signup"
+
+VALUES
+    ( 1,       'Aleesia Algorithm', 'aleesia.algorithm@uw.edu',     '2014-10-24'),
+    ( 2,       'DeAndre Data',      'datad@comcast.net',            '2008-01-20'),
+    ( 3,       'Chris Collection',  'chris.collection@outlook.com', '2012-01-20'),
+    ( 4,       'Brandy Boolean',    'bboolean@nasa.gov',            '1999-10-15');
+
+---------------------------------
+  1. SELECT email, signup
+     FROM users
+     WHERE name = 'DeAndre Data';
+
+  2. SELECT userid
+     FROM users
+     WHERE email = 'aleesia.algorithm@uw.edu';
+
+  3. SELECT *
+     FROM users
+     WHERE userid = 4;
+
+
+
+
+
