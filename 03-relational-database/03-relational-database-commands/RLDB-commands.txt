@@ -1,0 +1,175 @@
+1. List the commands for adding, updating, and deleting data
+---------------------------------
+
+  - The option to add a column is ADD COLUMN.
+  - Use INSERT INTO command to place data into our table.
+  - Change data with the UPDATE command.
+  - Delete data with the DELETE command.
+  - Change our table with the ALTER TABLE command.
+  - Delete our table with the DROP TABLE command.
+
+---------------------------------
+2. Explain the structure for each type of command.
+---------------------------------
+
+  - The structre for ADD COLUMN is:   ALTER TABLE products ADD COLUMN description text;
+  - The structre for INSERT INTO is:  INSERT INTO users (name, newuser, active) VALUES ('John Smith', TRUE, FALSE);
+  - The structre for UPDATE is:       UPDATE products SET price=159.99 WHERE id=11773;
+  - The structre for DELETE FROM is:  DELETE FROM products WHERE id=11776;
+  - The structre for ALTER TABLE is:  ALTER TABLE products ADD COLUMN description text;
+  - The structre for DROP TABLE is:   DROP TABLE products;
+
+---------------------------------
+3. What are some the data types that can be used in tables? Give a real world example of each.
+---------------------------------
+
+  Our table, for example is:
+  id      name                          price   description
+  11773   South Face Jacket             174.99  None
+  11774   Big Mountain 2-Person Tent    209.99  None
+
+  Here we are using the types:
+    - id:           numeric - integer type (bc it will never be converted to doubles since this is an id)
+    - name:         character - text
+    - price:        numeric - floating point type
+    - description:  character - text
+
+-------------------
+    Side note(s):
+    integer versus numeric:
+    Sometimes you may want to specifically store a vector as integers if you know that they will never be converted to doubles (used as ID values or indexing) since integers require less storage space.
+    ref: https://stackoverflow.com/questions/23660094/whats-the-difference-between-integer-class-and-numeric-class-in-r/23660949
+
+    text versus string:
+    As a general rule of thumb, use :string for short text input (username, email, password, titles, etc.) and use :text for longer expected input such as descriptions, comment content, etc.
+    https://stackoverflow.com/questions/3354330/difference-between-string-and-text-in-rails
+
+---------------------------------
+4. Think through how to create a new table to hold a list of people invited to a wedding.
+   ***** This table needs to have first and last name, whether they sent in their RSVP, the number of guests they are bringing, and the number of meals (1 for adults and 1/2 for children).
+
+  Which data type would you use to store each of the following pieces of information?
+    + First and last name.
+      - text
+
+    + Whether they sent in their RSVP.
+      - boolean
+
+    + Number of guests.
+      - integer
+
+    + Number of meals.
+      - floating point
+
+    + Write a command that makes the table to track the wedding.
+      - CREATE TABLE wedding (
+          first name text,
+          last name text,
+          RSVP boolean,
+          guests integer,
+          meals NUMERIC(5, 2)
+        );
+
+    + Using the table we just created, write a command that adds a column to track whether they were sent a thank you card.
+      - ALTER TABLE wedding ADD COLUMN thank_you_card_sent boolean;
+
+    + You have decided to move the data about the meals to another table, so write a command to remove the column storing the number meals from the wedding table.
+      - ALTER TABLE wedding DROP COLUMN meals;
+
+    + The guests are going to need a place to sit at the reception, so write a command that adds a column for table number.
+      - ALTER TABLE wedding ADD COLUMN table_number integer;
+
+    + The wedding is over and we do not need to keep this information, so write a command that deletes the wedding table from the database.
+      - DROP TABLE wedding;
+
+-------------------
+    Side note(s):
+    schema versus table:
+    schema : database : table :: floor plan : house : room
+    https://stackoverflow.com/questions/298739/what-is-the-difference-between-a-schema-and-a-table-and-a-database
+
+    floating point how to put in a table
+    NUMERIC(precision, scale)
+    https://stackoverflow.com/questions/2377174/how-do-i-interpret-precision-and-scale-of-a-number-in-a-database
+
+---------------------------------
+5. Write a command to make a new table to hold the books in a library with the columns ISBN, title, author, genre, publishing date, number of copies, and available copies.
+      - CREATE TABLE books (
+          ISBN integer,
+          title text,
+          author text,
+          genre text,
+          publishing_date date,
+          number_of_copie integer,
+          available_copies integer
+        );
+
+
+  + Find three books and add their information to the table.
+      - INSERT INTO books VALUES (0231133839, 'The Art of War', 'Sun Tzu', 'Intelligence Services', '2009-04-08', 500, 200);
+      - INSERT INTO books VALUES (0394430778, 'The Invisible Government', 'David Wise', 'Intelligence Services', '1997-01-08', 250, 400);
+      - INSERT INTO books VALUES (0684834979, 'From the Shadows', 'Robert M. Gates', 'Intelligence Services', '1996-02-23', 330, 5000);
+
+  + Someone has just checked out one of the books. Change the available copies column to 1 fewer.
+      - UPDATE books SET copies=499 WHERE isbn=0231133839;
+
+
+  + Now one of the books has been added to the banned books list. Remove it from the table.
+      - DELETE FROM books WHERE isbn=394430778;
+
+---------------------------------
+6. Write a command to make a new table to hold spacecrafts. Information should include id, name, year launched, country of origin, a brief description of the mission, orbiting body, if it is currently operating, and approximate miles from Earth. In addition to the table creation, provide commands that perform the following operations:
+      - CREATE TABLE spacecraft (
+          id integer,
+          name text,
+          year_launched date,
+          country_of_origin text,
+          description_of_mission text,
+          orbiting_body text,
+          currently_operating boolean,
+          distance_from_Earth float
+        );
+
+  + Add 3 non-Earth-orbiting satellites to the table.
+      - INSERT INTO spacecraft VALUES (341, 'Lenny', '2040-06-24', 'USA', 'Let them eat cake!', 'The Moon', true, 11.2222);
+      - INSERT INTO spacecraft VALUES (695, 'Karl', '2043-05-05', 'Mexico', 'Boom, Here comes the noise!', 'Mars', false, 98.452);
+      - INSERT INTO spacecraft VALUES (421, 'Sylvia', '2020-06-03', 'Indonesia', 'Up ahead!', 'Venus', false, .02229);
+
+  + Remove one of the satellites from the table since it has just been crashed into the planet.
+      - DELETE FROM spacecraft WHERE id=695;
+
+  + Edit another satellite because it is no longer operating and change the value to reflect that.
+      - UPDATE spacecraft SET currently_operating=false WHERE id=341;
+
+-------------------
+    Side note(s):
+    WHAT IS A FLOAT? sql
+    Float is Approximate-number data type, which means that not all values in the data type range can be represented exactly.
+
+    Decimal/Numeric is Fixed-Precision data type, which means that all the values in the data type range can be represented exactly with precision and scale. You can use decimal for money saving.
+    https://stackoverflow.com/questions/1056323/difference-between-numeric-float-and-decimal-in-sql-server
+
+---------------------------------
+7. Write a command to make a new table to hold the emails in your inbox. This table should include an id, the subject line, the sender, any additional recipients, the body of the email, the timestamp, whether or not it’s been read, and the id of the email chain it’s in. Also provide commands that perform the following operations:
+      - CREATE TABLE emails (
+        id integer,
+        subject_line text,
+        sender text,
+        additional_recipients text,
+        body_of_the_email text,
+        timestamp timestamp,
+        read boolean,
+        id_of_email integer
+      );
+
+  + Add 3 new emails to the inbox.
+      - INSERT INTO emails VALUES (56691, 'Free Lunch Tomorrow', 'Claire', 'Sarah, Mike, Joe', 'Blank', '2019-02-27', true, 5);
+      - INSERT INTO emails VALUES (60025, 'Trash', 'Mike', 'Claire, Sarah, Joe', 'Clean Sweep refrigerator time!', '2019-03-01', true, 6);
+      - INSERT INTO emails VALUES (33274, 'Bike Ride?', 'Joe', 'Claire, Sarah, Mike', 'Today after 4pm', '2019-02-27', true, 9);
+
+  + You’ve just deleted one of the emails, so write a command to remove the row from the inbox table.
+      - DELETE FROM emails WHERE id=33274;
+
+  + You started reading an email but just heard a crash in another room. Mark the email as unread before investigating, so you can come back to 
+it later.
+      - UPDATE emails SET read=false WHERE id=60025;
