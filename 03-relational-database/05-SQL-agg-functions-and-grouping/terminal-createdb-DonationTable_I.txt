@@ -1,0 +1,360 @@
+Last login: Mon Mar  4 13:00:44 on ttys000
+lcaton-mbp:05-SQL-agg-functions-and-grouping lcaton$ createdb -U postgres donationtable
+lcaton-mbp:05-SQL-agg-functions-and-grouping lcaton$ psql -f donations.sql donationtable postgres
+CREATE TABLE
+INSERT 0 27
+lcaton-mbp:05-SQL-agg-functions-and-grouping lcaton$ psql donationtable postgres
+psql (10.4, server 11.2)
+WARNING: psql major version 10, server major version 11.
+         Some psql features might not work.
+Type "help" for help.
+
+donationtable=#     SELECT SUM(amount)
+donationtable-#     FROM donations
+donationtable-#     WHERE date BETWEEN '2017-01-01' AND '2017-12-31';
+   sum    
+----------
+ 993.0000
+(1 row)
+
+donationtable=#     SELECT SUM(amount)
+donationtable-#     FROM donations;
+   sum    
+----------
+ 993.0000
+(1 row)
+
+donationtable=#     SELECT SUM(amount), donor
+donationtable-#     FROM donations;
+ERROR:  column "donations.donor" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: SELECT SUM(amount), donor
+                            ^
+donationtable=#     SELECT SUM(amount) AS total_donations, donor
+donationtable-#     FROM donations
+donationtable-#     GROUPED BY donor;
+ERROR:  syntax error at or near "BY"
+LINE 3:     GROUPED BY donor;
+                    ^
+donationtable=#     SELECT SUM(amount) AS total_donations, donor
+donationtable-#     FROM donations
+donationtable-#     GROUP BY donor;
+ total_donations |   donor    
+-----------------+------------
+         25.0000 | Bran
+         60.0000 | Arya
+        173.0000 | Daenerys
+         30.0000 | Ygritte
+         50.0000 | Tormund
+         33.0000 | Sansa
+         20.0000 | Samwell
+         45.0000 | Melisandre
+         20.0000 | Bronn
+         90.0000 | Missandei
+        120.0000 | Tyrion
+          7.0000 | Gilly
+         75.0000 | Brienne
+        120.0000 | Margaery
+         25.0000 | Jon
+         10.0000 | Daario
+         20.0000 | Theon
+         70.0000 | Petyr
+(18 rows)
+
+donationtable=#     SELECT AVG(amount) AS average_donation_per_donor
+donationtable-#     FROM donations
+donationtable-#     GROUP BY donor;
+ average_donation_per_donor 
+----------------------------
+        25.0000000000000000
+        20.0000000000000000
+        86.5000000000000000
+        30.0000000000000000
+        50.0000000000000000
+        33.0000000000000000
+        20.0000000000000000
+        45.0000000000000000
+        20.0000000000000000
+        22.5000000000000000
+        40.0000000000000000
+         7.0000000000000000
+        75.0000000000000000
+       120.0000000000000000
+        25.0000000000000000
+        10.0000000000000000
+        10.0000000000000000
+        70.0000000000000000
+(18 rows)
+
+donationtable=#     SELECT amount
+donationtable-#     FROM donations
+donationtable-#     WHERE amount < $100;
+ERROR:  there is no parameter $100
+LINE 3:     WHERE amount < $100;
+                           ^
+donationtable=#     SELECT amount
+donationtable-#     FROM donations
+donationtable-#     WHERE amount < 100;
+ amount  
+---------
+ 25.0000
+ 30.0000
+ 71.0000
+ 60.0000
+ 33.0000
+ 25.0000
+ 10.0000
+ 15.0000
+ 50.0000
+ 25.0000
+ 30.0000
+ 75.0000
+ 20.0000
+ 45.0000
+ 70.0000
+  5.0000
+ 20.0000
+ 10.0000
+  7.0000
+ 30.0000
+ 50.0000
+ 15.0000
+ 10.0000
+ 25.0000
+ 15.0000
+(25 rows)
+
+donationtable=#     SELECT amount
+donationtable-#     FROM donations
+donationtable-#     WHERE amount < 100.00;
+ amount  
+---------
+ 25.0000
+ 30.0000
+ 71.0000
+ 60.0000
+ 33.0000
+ 25.0000
+ 10.0000
+ 15.0000
+ 50.0000
+ 25.0000
+ 30.0000
+ 75.0000
+ 20.0000
+ 45.0000
+ 70.0000
+  5.0000
+ 20.0000
+ 10.0000
+  7.0000
+ 30.0000
+ 50.0000
+ 15.0000
+ 10.0000
+ 25.0000
+ 15.0000
+(25 rows)
+
+donationtable=#     SELECT amount
+donationtable-#     FROM donations
+donationtable-#     WHERE amount > 100.00;
+  amount  
+----------
+ 102.0000
+ 120.0000
+(2 rows)
+
+donationtable=#     SELECT MAX(amount)
+donationtable-#     FROM donations;
+   max    
+----------
+ 120.0000
+(1 row)
+
+donationtable=#     SELECT MIN(amount)
+donationtable-#     FROM donations;
+  min   
+--------
+ 5.0000
+(1 row)
+
+donationtable=#  SELECT id, SUM (amount)
+donationtable-#  FROM payment
+donationtable-#  HAVING SUM (amount) > 200;
+ERROR:  relation "payment" does not exist
+LINE 2:  FROM payment
+              ^
+donationtable=#  SELECT id, SUM (amount)
+donationtable-#  FROM payment
+donationtable-#  HAVING SUM (amount) > 200;
+ERROR:  relation "payment" does not exist
+LINE 2:  FROM payment
+              ^
+donationtable=#  SELECT amount, SUM (amount)
+donationtable-# FROM donations
+donationtable-# HAVING SUM (amount) > 200;
+ERROR:  column "donations.amount" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: SELECT amount, SUM (amount)
+               ^
+donationtable=#     SELECT id, SUM(amount)
+donationtable-#     FROM donations
+donationtable-#     HAVING SUM(amount) > 200
+donationtable-#     GROUP BY id;
+ERROR:  syntax error at or near "GROUP"
+LINE 4:     GROUP BY id;
+            ^
+donationtable=# SELECT * FROM donations
+donationtable-# ;
+   donor    |  amount  |    date    
+------------+----------+------------
+ Daenerys   | 102.0000 | 2017-03-22
+ Missandei  |  25.0000 | 2017-03-23
+ Missandei  |  30.0000 | 2017-03-24
+ Daenerys   |  71.0000 | 2017-03-25
+ Tyrion     |  60.0000 | 2017-03-26
+ Sansa      |  33.0000 | 2017-03-27
+ Jon        |  25.0000 | 2017-03-28
+ Missandei  |  10.0000 | 2017-03-29
+ Arya       |  15.0000 | 2017-03-30
+ Tormund    |  50.0000 | 2017-03-31
+ Bran       |  25.0000 | 2017-04-01
+ Arya       |  30.0000 | 2017-04-02
+ Brienne    |  75.0000 | 2017-04-03
+ Margaery   | 120.0000 | 2017-04-04
+ Samwell    |  20.0000 | 2017-04-05
+ Melisandre |  45.0000 | 2017-04-06
+ Petyr      |  70.0000 | 2017-04-07
+ Theon      |   5.0000 | 2017-04-08
+ Bronn      |  20.0000 | 2017-04-09
+ Daario     |  10.0000 | 2017-04-10
+ Gilly      |   7.0000 | 2017-04-11
+ Ygritte    |  30.0000 | 2017-04-12
+ Tyrion     |  50.0000 | 2017-04-13
+ Arya       |  15.0000 | 2017-04-14
+ Tyrion     |  10.0000 | 2017-04-15
+ Missandei  |  25.0000 | 2017-04-16
+ Theon      |  15.0000 | 2017-04-17
+(27 rows)
+
+donationtable=#     SELECT donor, SUM(amount)
+donationtable-#     FROM donations
+donationtable-#     HAVING SUM(amount) > 200
+donationtable-#     GROUP BY donor;
+ERROR:  syntax error at or near "GROUP"
+LINE 4:     GROUP BY donor;
+            ^
+donationtable=#     SELECT donor, SUM(amount)
+donationtable-#     FROM donations
+donationtable-#     GROUP BY donor
+donationtable-#     HAVING SUM(amount) > 200;
+ donor | sum 
+-------+-----
+(0 rows)
+
+donationtable=#     SELECT donor, SUM(amount)
+donationtable-#     FROM donations
+donationtable-#     GROUP BY amount
+donationtable-#     HAVING SUM(amount) > 200;
+ERROR:  column "donations.donor" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: SELECT donor, SUM(amount)
+               ^
+donationtable=#     SELECT donor, SUM(amount)
+donationtable-#     FROM donations
+donationtable-#     GROUP BY donor
+donationtable-#     HAVING SUM(amount) < 200;
+   donor    |   sum    
+------------+----------
+ Bran       |  25.0000
+ Arya       |  60.0000
+ Daenerys   | 173.0000
+ Ygritte    |  30.0000
+ Tormund    |  50.0000
+ Sansa      |  33.0000
+ Samwell    |  20.0000
+ Melisandre |  45.0000
+ Bronn      |  20.0000
+ Missandei  |  90.0000
+ Tyrion     | 120.0000
+ Gilly      |   7.0000
+ Brienne    |  75.0000
+ Margaery   | 120.0000
+ Jon        |  25.0000
+ Daario     |  10.0000
+ Theon      |  20.0000
+ Petyr      |  70.0000
+(18 rows)
+
+donationtable=#     SELECT donor, SUM(amount)
+    FROM donations
+    GROUP BY donor
+    HAVING SUM(amount) > 200;
+ donor | sum 
+-------+-----
+(0 rows)
+
+donationtable=#     SELECT donor, (array_agg(sum ORDER BY avg DESC))[1], SUM(amount)
+donationtable-#     FROM donations
+donationtable-#     GROUP BY donor;
+ERROR:  column "sum" does not exist
+LINE 1: SELECT donor, (array_agg(sum ORDER BY avg DESC))[1], SUM(amo...
+                                 ^
+donationtable=#     SELECT donor, (array_agg(amount ORDER BY avg DESC))[1], SUM(amount)
+donationtable-#     FROM donations
+donationtable-#     GROUP BY donor;
+ERROR:  column "avg" does not exist
+LINE 1: SELECT donor, (array_agg(amount ORDER BY avg DESC))[1], SUM(...
+                                                 ^
+donationtable=#     SELECT donor, (array_agg(donor ORDER BY amount DESC))[1], MAX(avg)
+donationtable-#     FROM donations
+donationtable-#     GROUP BY donor;
+ERROR:  column "avg" does not exist
+LINE 1: ... donor, (array_agg(donor ORDER BY amount DESC))[1], MAX(avg)
+                                                                   ^
+donationtable=#     SELECT donor, (array_agg(donor ORDER BY amount DESC))[1], MAX(amount)
+donationtable-#     FROM donations
+donationtable-#     GROUP BY donor;
+   donor    | array_agg  |   max    
+------------+------------+----------
+ Arya       | Arya       |  30.0000
+ Bran       | Bran       |  25.0000
+ Brienne    | Brienne    |  75.0000
+ Bronn      | Bronn      |  20.0000
+ Daario     | Daario     |  10.0000
+ Daenerys   | Daenerys   | 102.0000
+ Gilly      | Gilly      |   7.0000
+ Jon        | Jon        |  25.0000
+ Margaery   | Margaery   | 120.0000
+ Melisandre | Melisandre |  45.0000
+ Missandei  | Missandei  |  30.0000
+ Petyr      | Petyr      |  70.0000
+ Samwell    | Samwell    |  20.0000
+ Sansa      | Sansa      |  33.0000
+ Theon      | Theon      |  15.0000
+ Tormund    | Tormund    |  50.0000
+ Tyrion     | Tyrion     |  60.0000
+ Ygritte    | Ygritte    |  30.0000
+(18 rows)
+
+donationtable=# 
+donationtable=#     SELECT donor, (donor_amount(SUM(amount)),
+donationtable(#     FROM donations
+donationtable(#     GROUP BY donor;
+donationtable(# ;
+donationtable(# );
+ERROR:  syntax error at or near "FROM"
+LINE 2:     FROM donations
+            ^
+donationtable=#     SELECT donor, (donor_amount(SUM(amount))),
+donationtable-#     FROM donations
+donationtable-#     GROUP BY donor;
+ERROR:  syntax error at or near "FROM"
+LINE 2:     FROM donations
+            ^
+donationtable=#     SELECT id, SUM(amount)
+donationtable-#     FROM payment
+donationtable-#     GROUP BY id
+donationtable-#     HAVING SUM(amount) > 200;
+ERROR:  relation "payment" does not exist
+LINE 2:     FROM payment
+                 ^
+donationtable=# 

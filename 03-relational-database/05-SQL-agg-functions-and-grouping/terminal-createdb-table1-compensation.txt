@@ -1,0 +1,168 @@
+Last login: Mon Mar  4 11:40:30 on ttys000
+lcaton-mbp:05-SQL-agg-functions-and-grouping lcaton$  psql table1 postgres
+psql (10.4, server 11.2)
+WARNING: psql major version 10, server major version 11.
+         Some psql features might not work.
+Type "help" for help.
+
+table1=# COPY compensation FROM '/Users/lcaton/bloc/sep-assignments/03-relational-database/05-SQL-agg-functions-and-grouping/hogwarts-compensation.csv'
+table1-# DELIMITER ',' CSV;
+COPY 6
+table1=# SELECT * FROM compensation;
+ id | professor_id | salary | vacation_days 
+----+--------------+--------+---------------
+  1 |            1 |  64000 |             2
+  2 |            2 |  35000 |             8
+  3 |            3 |  56750 |            10
+  4 |            4 |  42950 |             8
+  5 |            5 |  30000 |             4
+  6 |            6 | 102750 |            22
+(6 rows)
+
+table1=# SELECT SUM(salary)
+table1-#   FROM compensation;
+  sum   
+--------
+ 331450
+(1 row)
+
+table1=# SELECT MAX(salary)
+table1-#   FROM compensation;
+  max   
+--------
+ 102750
+(1 row)
+
+table1=# SELECT COUNT(DISTINCT vacation_days),  
+table1-#   FROM compensation;
+ERROR:  syntax error at or near "FROM"
+LINE 2:   FROM compensation;
+          ^
+table1=# SELECT COUNT(DISTINCT vacation_days),  
+table1-# FROM compensation;
+ERROR:  syntax error at or near "FROM"
+LINE 2: FROM compensation;
+        ^
+table1=# SELECT COUNT(DISTINCT vacation_days) FROM compensation;
+ count 
+-------
+     5
+(1 row)
+
+table1=# SELECT DISTINCT vacation_days,  
+table1-#   FROM compensation;
+ERROR:  syntax error at or near "FROM"
+LINE 2:   FROM compensation;
+          ^
+table1=# SELECT DISTINCT vacation_days,  
+table1-#  FROM compensation;
+ERROR:  syntax error at or near "FROM"
+LINE 2:  FROM compensation;
+         ^
+table1=# SELECT DISTINCT vacation_days
+table1-# FROM compensation;
+ vacation_days 
+---------------
+            22
+             4
+            10
+             2
+             8
+(5 rows)
+
+table1=# SELECT AVG(salary) AS average_salary, vacation_days
+table1-#   FROM compensation
+table1-#   GROUP BY vacation_days;
+   average_salary    | vacation_days 
+---------------------+---------------
+ 102750.000000000000 |            22
+  30000.000000000000 |             4
+  56750.000000000000 |            10
+  64000.000000000000 |             2
+  38975.000000000000 |             8
+(5 rows)
+
+table1=# SELECT professor_id, salary, vacation_days
+table1-#   FROM compensation
+table1-#   ORDER BY vacation_days;
+ professor_id | salary | vacation_days 
+--------------+--------+---------------
+            1 |  64000 |             2
+            5 |  30000 |             4
+            2 |  35000 |             8
+            4 |  42950 |             8
+            3 |  56750 |            10
+            6 | 102750 |            22
+(6 rows)
+
+table1=# SELECT column(s)
+table1-#     FROM table
+table1-#     (ORDER BY sort_expression [ASC | DESC])
+table1-#     (LIMIT { number | ALL } ] [ OFFSET number);
+ERROR:  syntax error at or near "column"
+LINE 1: SELECT column(s)
+               ^
+table1=# SELECT column(s)
+table1-# FROM table
+table1-# (ORDER BY sort_expression [ASC | DESC])
+table1-# (LIMIT { number | ALL } ] [ OFFSET number);
+ERROR:  syntax error at or near "column"
+LINE 1: SELECT column(s)
+               ^
+table1=# SELECT column                             
+FROM table
+(ORDER BY sort_expression [ASC | DESC])
+(LIMIT { number | ALL } ] [ OFFSET number);
+ERROR:  syntax error at or near "column"
+LINE 1: SELECT column
+               ^
+table1=# SELECT *     
+FROM table
+(ORDER BY sort_expression [ASC | DESC])
+(LIMIT { number | ALL } ] [ OFFSET number);
+ERROR:  syntax error at or near "table"
+LINE 2: FROM table
+             ^
+table1=# SELECT professor_id, salary, vacation_days
+table1-#   FROM compensation
+table1-#   ORDER BY vacation_days
+table1-#   LIMIT 2;
+ professor_id | salary | vacation_days 
+--------------+--------+---------------
+            1 |  64000 |             2
+            5 |  30000 |             4
+(2 rows)
+
+table1=# SELECT professor_id, salary, vacation_days
+table1-#   FROM compensation
+table1-#   ORDER BY vacation_days
+table1-#   LIMIT 2 OFFSET 2;
+ professor_id | salary | vacation_days 
+--------------+--------+---------------
+            2 |  35000 |             8
+            4 |  42950 |             8
+(2 rows)
+
+table1=# SELECT AVG(salary) as average_salary, vacation_days
+table1-#   FROM compensation
+table1-#   GROUP BY vacation_days
+table1-#   HAVING AVG(salary) < 50000
+table1-#   ORDER BY vacation_days DESC;
+   average_salary   | vacation_days 
+--------------------+---------------
+ 38975.000000000000 |             8
+ 30000.000000000000 |             4
+(2 rows)
+
+table1=# SELECT AVG(salary) as average_salary, vacation_days
+table1-#   FROM compensation
+table1-#   GROUP BY vacation_days
+table1-#   HAVING AVG(salary) < 50000
+table1-#   ORDER BY vacation_days DESC;
+   average_salary   | vacation_days 
+--------------------+---------------
+ 38975.000000000000 |             8
+ 30000.000000000000 |             4
+(2 rows)
+
+table1=# 
