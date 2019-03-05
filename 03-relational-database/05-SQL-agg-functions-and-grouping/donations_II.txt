@@ -1,0 +1,163 @@
+Last login: Tue Mar  5 09:40:08 on ttys001
+lcaton-mbp:04-relational-database-SELECT lcaton$ cd ..
+lcaton-mbp:03-relational-database lcaton$ ls
+01-relational-database-intro		02-using-relational-database		03-relational-database-commands		04-relational-database-SELECT		05-SQL-agg-functions-and-grouping
+lcaton-mbp:03-relational-database lcaton$ cd 05-SQL-agg-functions-and-grouping
+lcaton-mbp:05-SQL-agg-functions-and-grouping lcaton$ psql donationtable postgres
+psql (10.4, server 11.2)
+WARNING: psql major version 10, server major version 11.
+         Some psql features might not work.
+Type "help" for help.
+
+donationtable=# SELECT * FROM donations;
+   donor    |  amount  |    date    
+------------+----------+------------
+ Daenerys   | 102.0000 | 2017-03-22
+ Missandei  |  25.0000 | 2017-03-23
+ Missandei  |  30.0000 | 2017-03-24
+ Daenerys   |  71.0000 | 2017-03-25
+ Tyrion     |  60.0000 | 2017-03-26
+ Sansa      |  33.0000 | 2017-03-27
+ Jon        |  25.0000 | 2017-03-28
+ Missandei  |  10.0000 | 2017-03-29
+ Arya       |  15.0000 | 2017-03-30
+ Tormund    |  50.0000 | 2017-03-31
+ Bran       |  25.0000 | 2017-04-01
+ Arya       |  30.0000 | 2017-04-02
+ Brienne    |  75.0000 | 2017-04-03
+ Margaery   | 120.0000 | 2017-04-04
+ Samwell    |  20.0000 | 2017-04-05
+ Melisandre |  45.0000 | 2017-04-06
+ Petyr      |  70.0000 | 2017-04-07
+ Theon      |   5.0000 | 2017-04-08
+ Bronn      |  20.0000 | 2017-04-09
+ Daario     |  10.0000 | 2017-04-10
+ Gilly      |   7.0000 | 2017-04-11
+ Ygritte    |  30.0000 | 2017-04-12
+ Tyrion     |  50.0000 | 2017-04-13
+ Arya       |  15.0000 | 2017-04-14
+ Tyrion     |  10.0000 | 2017-04-15
+ Missandei  |  25.0000 | 2017-04-16
+ Theon      |  15.0000 | 2017-04-17
+(27 rows)
+
+donationtable=#     SELECT donor, MAX(amount)
+donationtable-#     FROM donations
+donationtable-#     ORDER BY amount
+donationtable-#     LIMIT 5;
+ERROR:  column "donations.donor" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: SELECT donor, MAX(amount)
+               ^
+donationtable=#     SELECT donor, MAX(amount)
+donationtable-#     FROM donations
+donationtable-#     GROUPED BY amount
+donationtable-#     LIMIT 5;
+ERROR:  syntax error at or near "BY"
+LINE 3:     GROUPED BY amount
+                    ^
+donationtable=#     SELECT donor, MAX(amount)
+donationtable-#     FROM donations
+donationtable-#     GROUPED BY MAX(amount)
+donationtable-#     LIMIT 5;
+ERROR:  syntax error at or near "BY"
+LINE 3:     GROUPED BY MAX(amount)
+                    ^
+donationtable=#     SELECT donor, MAX(amount)
+donationtable-#     FROM donations
+donationtable-#     ORDER BY MAX(amount) ASC
+donationtable-#     LIMIT 5;
+ERROR:  column "donations.donor" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: SELECT donor, MAX(amount)
+               ^
+donationtable=#     SELECT donor, amount
+donationtable-#     FROM donations
+donationtable-#     ORDER BY amount ASC
+donationtable-#     LIMIT 5;
+   donor   | amount  
+-----------+---------
+ Theon     |  5.0000
+ Gilly     |  7.0000
+ Missandei | 10.0000
+ Daario    | 10.0000
+ Tyrion    | 10.0000
+(5 rows)
+
+donationtable=#     SELECT donor, amount
+donationtable-#     FROM donations
+donationtable-#     ORDER BY amount DESC
+donationtable-#     LIMIT 5;
+  donor   |  amount  
+----------+----------
+ Margaery | 120.0000
+ Daenerys | 102.0000
+ Brienne  |  75.0000
+ Daenerys |  71.0000
+ Petyr    |  70.0000
+(5 rows)
+
+donationtable=#     SELECT donor, amount
+donationtable-#     FROM donations
+donationtable-#     ORDER BY amount DESC
+donationtable-#     LIMIT 5 OFFSET 5;
+   donor    | amount  
+------------+---------
+ Tyrion     | 60.0000
+ Tyrion     | 50.0000
+ Tormund    | 50.0000
+ Melisandre | 45.0000
+ Sansa      | 33.0000
+(5 rows)
+
+donationtable=#     SELECT donor, amount
+donationtable-#     FROM donations
+donationtable-#     ORDER BY amount DESC;
+   donor    |  amount  
+------------+----------
+ Margaery   | 120.0000
+ Daenerys   | 102.0000
+ Brienne    |  75.0000
+ Daenerys   |  71.0000
+ Petyr      |  70.0000
+ Tyrion     |  60.0000
+ Tormund    |  50.0000
+ Tyrion     |  50.0000
+ Melisandre |  45.0000
+ Sansa      |  33.0000
+ Arya       |  30.0000
+ Missandei  |  30.0000
+ Ygritte    |  30.0000
+ Missandei  |  25.0000
+ Bran       |  25.0000
+ Jon        |  25.0000
+ Missandei  |  25.0000
+ Samwell    |  20.0000
+ Bronn      |  20.0000
+ Theon      |  15.0000
+ Arya       |  15.0000
+ Arya       |  15.0000
+ Missandei  |  10.0000
+ Daario     |  10.0000
+ Tyrion     |  10.0000
+ Gilly      |   7.0000
+ Theon      |   5.0000
+(27 rows)
+
+donationtable=#     SELECT donor, amount
+donationtable-#     FROM donations
+donationtable-#     ORDER BY amount DESC
+donationtable-#     LIMIT 10 OFFSET 5;
+   donor    | amount  
+------------+---------
+ Tyrion     | 60.0000
+ Tormund    | 50.0000
+ Tyrion     | 50.0000
+ Melisandre | 45.0000
+ Sansa      | 33.0000
+ Arya       | 30.0000
+ Missandei  | 30.0000
+ Ygritte    | 30.0000
+ Missandei  | 25.0000
+ Bran       | 25.0000
+(10 rows)
+
+donationtable=# 

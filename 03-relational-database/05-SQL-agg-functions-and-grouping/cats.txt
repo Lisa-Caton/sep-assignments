@@ -1,0 +1,267 @@
+Last login: Mon Mar  4 13:01:02 on ttys001
+lcaton-mbp:04-relational-database-SELECT lcaton$ psql -f cats.sql AnimalCat postgres
+psql:cats.sql:8: ERROR:  relation "cats" already exists
+INSERT 0 5
+lcaton-mbp:04-relational-database-SELECT lcaton$ psql AnimalCat postgres
+psql (10.4, server 11.2)
+WARNING: psql major version 10, server major version 11.
+         Some psql features might not work.
+Type "help" for help.
+
+AnimalCat=# SELECT * FROM cats
+AnimalCat-# ;
+ id |   name   | gender | age | intake_date | adoption_date 
+----+----------+--------+-----+-------------+---------------
+  1 | Mushi    | M      |   1 | 2016-01-09  | 2016-03-22
+  2 | Seashell | F      |   7 | 2016-01-09  | 
+  3 | Azul     | M      |   3 | 2016-01-11  | 2016-04-17
+  4 | Victoire | M      |   7 | 2016-01-11  | 2016-09-01
+  5 | Nala     | F      |   1 | 2016-01-12  | 
+  1 | Mushi    | M      |   1 | 2016-01-09  | 2016-03-22
+  2 | Seashell | F      |   7 | 2016-01-09  | 
+  3 | Azul     | M      |   3 | 2016-01-11  | 2016-04-17
+  4 | Victoire | M      |   7 | 2016-01-11  | 2016-09-01
+  5 | Nala     | F      |   1 | 2016-01-12  | 
+(10 rows)
+
+AnimalCat=#     SELECT intake-date
+AnimalCat-#     FROM cats
+AnimalCat-#     GROUP BY name;
+ERROR:  column "intake" does not exist
+LINE 1: SELECT intake-date
+               ^
+HINT:  Perhaps you meant to reference the column "cats.name".
+AnimalCat=#     SELECT intake_date
+AnimalCat-#     FROM cats
+AnimalCat-#     GROUP BY name;
+ERROR:  column "cats.intake_date" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: SELECT intake_date
+               ^
+AnimalCat=#     SELECT intake_date, name
+AnimalCat-#     FROM cats
+AnimalCat-#     GROUP BY intake_date;
+ERROR:  column "cats.name" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: SELECT intake_date, name
+                            ^
+AnimalCat=#     SELECT intake_date, name
+AnimalCat-#     FROM cats
+AnimalCat-#     ORDER BY intake_date;
+ intake_date |   name   
+-------------+----------
+ 2016-01-09  | Mushi
+ 2016-01-09  | Seashell
+ 2016-01-09  | Mushi
+ 2016-01-09  | Seashell
+ 2016-01-11  | Victoire
+ 2016-01-11  | Azul
+ 2016-01-11  | Azul
+ 2016-01-11  | Victoire
+ 2016-01-12  | Nala
+ 2016-01-12  | Nala
+(10 rows)
+
+AnimalCat=#     SELECT intake_date, name
+AnimalCat-#     FROM cats
+AnimalCat-#     ORDER BY intake_date DESC;
+ intake_date |   name   
+-------------+----------
+ 2016-01-12  | Nala
+ 2016-01-12  | Nala
+ 2016-01-11  | Victoire
+ 2016-01-11  | Azul
+ 2016-01-11  | Victoire
+ 2016-01-11  | Azul
+ 2016-01-09  | Mushi
+ 2016-01-09  | Seashell
+ 2016-01-09  | Mushi
+ 2016-01-09  | Seashell
+(10 rows)
+
+AnimalCat=#     SELECT intake_date, name
+AnimalCat-#     FROM cats
+AnimalCat-#     ORDER BY intake_date ASC;
+ intake_date |   name   
+-------------+----------
+ 2016-01-09  | Mushi
+ 2016-01-09  | Seashell
+ 2016-01-09  | Mushi
+ 2016-01-09  | Seashell
+ 2016-01-11  | Victoire
+ 2016-01-11  | Azul
+ 2016-01-11  | Azul
+ 2016-01-11  | Victoire
+ 2016-01-12  | Nala
+ 2016-01-12  | Nala
+(10 rows)
+
+AnimalCat=#   SELECT name, adoption_date
+AnimalCat-#   FROM cats
+AnimalCat-#   ORDER BY adoption_date ASC
+AnimalCat-#   LIMIT 5;
+   name   | adoption_date 
+----------+---------------
+ Mushi    | 2016-03-22
+ Mushi    | 2016-03-22
+ Azul     | 2016-04-17
+ Azul     | 2016-04-17
+ Victoire | 2016-09-01
+(5 rows)
+
+AnimalCat=#   SELECT name, adoption_date
+AnimalCat-#   FROM cats
+AnimalCat-#   ORDER BY adoption_date DESC
+AnimalCat-#   LIMIT 5;
+   name   | adoption_date 
+----------+---------------
+ Nala     | 
+ Seashell | 
+ Seashell | 
+ Nala     | 
+ Victoire | 2016-09-01
+(5 rows)
+
+AnimalCat=#   SELECT name, adoption_date
+AnimalCat-#   FROM cats
+AnimalCat-#   ORDER BY adoption_date DESC
+AnimalCat-#   LIMIT 5 OFFSET 4;
+   name   | adoption_date 
+----------+---------------
+ Victoire | 2016-09-01
+ Victoire | 2016-09-01
+ Azul     | 2016-04-17
+ Azul     | 2016-04-17
+ Mushi    | 2016-03-22
+(5 rows)
+
+AnimalCat=#   SELECT DISTINCT name, adoption_date
+AnimalCat-#   FROM cats
+AnimalCat-#   ORDER BY adoption_date DESC
+AnimalCat-#   LIMIT 5 OFFSET 4;
+ name  | adoption_date 
+-------+---------------
+ Mushi | 2016-03-22
+(1 row)
+
+AnimalCat=#   SELECT DISTINCT name, adoption_date
+AnimalCat-#   FROM cats
+AnimalCat-#   ORDER BY adoption_date DESC
+AnimalCat-#   LIMIT 5;
+   name   | adoption_date 
+----------+---------------
+ Seashell | 
+ Nala     | 
+ Victoire | 2016-09-01
+ Azul     | 2016-04-17
+ Mushi    | 2016-03-22
+(5 rows)
+
+AnimalCat=#     SELECT intake_date, name
+AnimalCat-#     FROM cats
+AnimalCat-#     WHERE intake_date is not null
+AnimalCat-#     ORDER BY intake_date ASC;
+ intake_date |   name   
+-------------+----------
+ 2016-01-09  | Mushi
+ 2016-01-09  | Seashell
+ 2016-01-09  | Mushi
+ 2016-01-09  | Seashell
+ 2016-01-11  | Victoire
+ 2016-01-11  | Azul
+ 2016-01-11  | Azul
+ 2016-01-11  | Victoire
+ 2016-01-12  | Nala
+ 2016-01-12  | Nala
+(10 rows)
+
+AnimalCat=# SELECT DISTINCT name, adoption_date
+AnimalCat-#     FROM cats
+AnimalCat-#     WHERE intake_date is not null
+AnimalCat-#     ORDER BY adoption_date DESC
+AnimalCat-#     LIMIT 5;
+   name   | adoption_date 
+----------+---------------
+ Seashell | 
+ Nala     | 
+ Victoire | 2016-09-01
+ Azul     | 2016-04-17
+ Mushi    | 2016-03-22
+(5 rows)
+
+AnimalCat=#     SELECT DISTINCT name
+AnimalCat-#     FROM cats
+AnimalCat-#     WHERE intake_date is not null
+AnimalCat-#     ORDER BY adoption_date DESC
+AnimalCat-#     LIMIT 5;
+ERROR:  for SELECT DISTINCT, ORDER BY expressions must appear in select list
+LINE 4:     ORDER BY adoption_date DESC
+                     ^
+AnimalCat=#     SELECT DISTINCT name, adoption_date
+AnimalCat-#     FROM cats
+AnimalCat-#     WHERE intake_date is not null
+AnimalCat-#     LIMIT 5;
+   name   | adoption_date 
+----------+---------------
+ Seashell | 
+ Mushi    | 2016-03-22
+ Victoire | 2016-09-01
+ Azul     | 2016-04-17
+ Nala     | 
+(5 rows)
+
+AnimalCat=#     SELECT DISTINCT name, adoption_date
+AnimalCat-#     FROM cats
+AnimalCat-#     WHERE adoption_date is not null
+AnimalCat-#     ORDER BY adoption_date DESC
+AnimalCat-#     LIMIT 5;
+   name   | adoption_date 
+----------+---------------
+ Victoire | 2016-09-01
+ Azul     | 2016-04-17
+ Mushi    | 2016-03-22
+(3 rows)
+
+AnimalCat=#   SELECT name
+AnimalCat-#   FROM cats
+AnimalCat-#   GROUP BY gender='F'
+AnimalCat-#   HAVING age > 2;
+ERROR:  column "cats.name" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: SELECT name
+               ^
+AnimalCat=#   SELECT name, gender
+AnimalCat-#   FROM cats
+AnimalCat-#   GROUP BY gender='F'
+AnimalCat-#   HAVING age > 2;
+ERROR:  column "cats.name" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: SELECT name, gender
+               ^
+AnimalCat=#   SELECT name, gender
+AnimalCat-#   FROM cats
+AnimalCat-#   GROUP BY name
+AnimalCat-#   WHERE gender='F'
+AnimalCat-#   HAVING age > 2;
+ERROR:  syntax error at or near "WHERE"
+LINE 4:   WHERE gender='F'
+          ^
+AnimalCat=#   SELECT name, gender
+AnimalCat-#   FROM cats
+AnimalCat-#   WHERE age > 2;
+   name   | gender 
+----------+--------
+ Seashell | F
+ Azul     | M
+ Victoire | M
+ Seashell | F
+ Azul     | M
+ Victoire | M
+(6 rows)
+
+AnimalCat=#   SELECT name, gender
+AnimalCat-#   FROM cats
+AnimalCat-#   WHERE age > 2 AND gender='F';
+   name   | gender 
+----------+--------
+ Seashell | F
+ Seashell | F
+(2 rows)
+
+AnimalCat=# 

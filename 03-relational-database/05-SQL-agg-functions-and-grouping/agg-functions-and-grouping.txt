@@ -1,0 +1,122 @@
+1. List 5 aggregate functions and explain, in your own words, what they are for. Include a real world example for each. If you can’t list these from memory, do these flashcards until you can!
+
+  + SUM   | grand total | to total all salaries for a given company
+  + AVG   | average value | to find the avergae of a companies salary
+  + COUNT | selecting all rows | the number of rows in a table
+  + MIN   | min value in a column | the smallest value in the salary_column
+  + MAX   | max value in a column | the largest value in the salary_column
+
+-----------------------------
+
+2. Given this donations table, write queries and include the output for the following:
+
+  + The total of all donations received in the past year.
+    SELECT SUM(amount)
+    FROM donations
+    WHERE date BETWEEN '2017-01-01' AND '2017-12-31';
+
+  + The total donations over time per donor (e.g. if Tanysha has donated 3 times with the amounts $25, $30, and $50, then the result would be | Tanysha | 105 |).
+    SELECT SUM(amount) AS total_donations, donor
+    FROM donations
+    GROUP BY donor;
+
+  + The average donation per donor.
+    SELECT AVG(amount) AS average_donation_per_donor
+    FROM donations
+    GROUP BY donor;
+
+  + The number of donations over $100.
+    SELECT amount
+    FROM donations
+    WHERE amount > 100.00;
+
+  + The largest donation received in a single instance from a single donor.
+    SELECT MAX(amount)
+    FROM donations;
+
+  + The smallest donation received.
+    SELECT MIN(amount)
+    FROM donations;
+
+-----------------------------
+
+3. How would you determine the display order of data returned by your SELECT statement?
+  + I would first figure out what condition I am trying to meet, then I would decide what is important about this data and if I should return by column name, or by a numerical range (ASC/DESC).
+
+-----------------------------
+
+4. What is a real world situation where you would use OFFSET?
+  + Let's say your balancing your checkbook and you have all rows by columns: purchase and total_amount. If I had already figured out the total of the first 5 purchases, I would use OFFSET to start at row 6 to pick-up where I had left off. 
+
+-----------------------------
+
+5. Why is it important to use ORDER BY when limiting your results?
+  + ORDER BY is great to use for sorting the results, (default is to sort them by ASC order), which is easy to do when you have a large range of data, you can quickly do a spot-check.
+
+-----------------------------
+
+6. What is the difference between HAVING and WHERE?
+  + When GROUP BY is not used, the WHERE and HAVING clauses are essentially equivalent.
+    However, when GROUP BY is used:
+    The WHERE clause is used to filter records from a result. The filtering occurs before any groupings are made.
+    The HAVING clause is used to filter values from a group (i.e., to check conditions after aggregation into groups has been performed).
+
+-----------------------------
+
+7. Correct the following SELECT statement:
+
+    SELECT id, SUM (amount)
+    FROM payment
+    HAVING SUM (amount) > 200;
+
+    error:
+    column "payment.amount" must appear in the GROUP BY clause or be used in an aggregate function
+
+    FIXED:
+    SELECT id, SUM(amount)
+    FROM payment
+    GROUP BY id
+    HAVING SUM(amount) > 200;
+
+    EXPLANATION:
+    1. "The problem with specifying non-grouped and non-aggregate fields in group by selects, is that engine has no way of knowing, which record's field it should return in this case."
+    2. "For me, it is not about a "common aggregation problem", but just about an incorrect SQL query. The single correct answer for "select the maximum avg for each cname..." is"
+    https://stackoverflow.com/questions/19601948/must-appear-in-the-group-by-clause-or-be-used-in-an-aggregate-function
+
+
+ -----------------------------
+
+8. Follow the instructions for the scenarios below:
+
+  + Given this cats table from the previous checkpoint, list all cats organized by intake date.
+    SELECT intake_date, name
+    FROM cats
+    ORDER BY intake_date ASC;
+
+  + Given this adoptions table, determine the 5 most recent adoptions to be featured for a social media promotion called "Happy Tails" which lists recent successful adoptions.
+    SELECT DISTINCT name, adoption_date
+    FROM cats
+    WHERE adoption_date is not null
+    ORDER BY adoption_date DESC
+    LIMIT 5;
+
+  + There is a potential adopter looking for an adult female cat. In the most efficient way possible, list all female cats 2 or more years old from the cats table.
+    SELECT name, gender
+    FROM cats
+    WHERE age > 2 AND gender='F';
+
+  + From the donations table (from problem #2), find the top 5 donors with the highest cumulative donation amounts to be honored as “Platinum Donors”.
+    SELECT donor, amount
+    FROM donations
+    ORDER BY amount DESC
+    LIMIT 5;
+
+  + From the donations table (from problem #2), find donors 6-15 with the next highest cumulative donation amounts to be honored as “Gold Donors”.
+    SELECT donor, amount
+    FROM donations
+    ORDER BY amount DESC
+    LIMIT 10 OFFSET 5;
+
+
+
+
