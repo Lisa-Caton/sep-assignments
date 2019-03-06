@@ -77,7 +77,7 @@
     WHERE age=7;
 
   + Find all of the names of the cats, so you don’t choose duplicate names for new cats.
-    SELECT name
+    SELECT DISTINCT ON (name) name
     FROM cats;
 
 -----------------------------------------
@@ -92,6 +92,8 @@
         (1) %Heart = Heart of the Tiger | (2) %Heart% = Home is where the heart is | (3) Hearts% = Breaking Hearts
   <=  | less than or equal to | age <= 5
   =>  | great than or equal to | age >= 40
+  !<  | checks if the value on the left of the operand is NOT less than the value on the right operand, if yes than condition becomes true
+  !>  | checks if the value on the left operand is NOT greater than the value on the right operand, if yes than condition becomes true
 
 -----------------------------------------
 7. From the cats table, what data is returned from these queries?
