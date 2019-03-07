@@ -40,7 +40,7 @@
   + Display the id, age, weight, and breed of all dogs that are either over 60lbs or Great Danes.
     SELECT id, age, weight, breed
     FROM dogs
-    WHERE weight > 65
+    WHERE weight > 60
     OR breed='great danes';
 
 -----------------------------------------
@@ -83,17 +83,28 @@
 -----------------------------------------
 6. List each comparison operator and explain, in your own words, when you would use it. Include a real world example for each.
   + If you can’t list these from memory, do these flashcards until you can!
-  <>  | equivalent to NOT equal | age <> 21
-  <   | less than | example: age < 65
-  >   | greater than | example: age > 21
-  =   | equal | dolphin = mammal
-  !=  | not equal | fish != mammal
-  %   | used at the beg, both front and back and last part of a word
-        (1) %Heart = Heart of the Tiger | (2) %Heart% = Home is where the heart is | (3) Hearts% = Breaking Hearts
-  <=  | less than or equal to | age <= 5
-  =>  | great than or equal to | age >= 40
-  !<  | checks if the value on the left of the operand is NOT less than the value on the right operand, if yes than condition becomes true
-  !>  | checks if the value on the left operand is NOT greater than the value on the right operand, if yes than condition becomes true
+  1. >       | greater than, when comparing 2 values                   | EXAMPLE: age > 21
+  2. <       | less than, when comparing 2 values                      | EXAMPLE: age < 65
+  3. =       | equal to, used when comparing 2 values                  | EXAMPLE: dolphin = mammal
+  4. <=      | less than or equal to, when comparing 2 values          | EXAMPLE: age <= 5
+  5. >=      | great than or equal to, when comparing 2 values         | EXAMPLE: age >= 40
+  6. !=      | not equal to, used when comparing 2 values              | EXAMPLE: fish != mammal
+  7. <>      | it means "not equal", either less than or greater than  | EXAMPLE: If x <> y Then 
+               READS: if x is less than y or x is greater than y then
+               Logical Outcome: "If x is anything except equal to y"
+  8. !<  | checks if the value on the left of the operand is NOT less than the value on the right operand, if yes than condition becomes true
+  9. !>  | checks if the value on the left operand is NOT greater than the value on the right operand, if yes than condition becomes true
+  10. %   | used at the beg, both front and back and last part of a word
+      (1) %Heart = Heart of the Tiger | (2) %Heart% = Home is where the heart is | (3) Hearts% = Breaking Hearts
+  11. LIKE    | used to pattern match a string                           | EXAMPLE: input LIK 'cat'
+  12. BETWEEN | The BETWEEN operator selects values within a given range | EXAMPLE: "a BETWEEN x AND y" => 
+               "a >= x AND a <= y"
+  13. IS DISTINCT FROM | expression IS DISTINCT FROM expression | EXAMPLE:
+  14. IS TRUE / IS FALSE | Boolean must be true or false | EXAMPLE: expression is TRUE (where the input could be null) will always return true or false
+  15. IS NULL | determines if the contents in the cell are null | EXAMPLE: Not a Boolean, which means, not true or false
+  16. AND | requires both expressions to be true for the row to be returned | EXAMPLE: Food can be healthy AND tasty
+  17. OR | requires one of the expressions to be true for the row to be returned | EXAMPLE: Do you like cats OR dogs
+  18. NOT | Requires the expression to be false for the row to be returned | EXAMPLE: Apples, NOT bananas
 
 -----------------------------------------
 7. From the cats table, what data is returned from these queries?
