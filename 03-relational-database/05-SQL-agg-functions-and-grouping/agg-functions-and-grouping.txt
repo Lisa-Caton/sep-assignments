@@ -11,32 +11,153 @@
 2. Given this donations table, write queries and include the output for the following:
 
   + The total of all donations received in the past year.
+
     SELECT SUM(amount)
     FROM donations
-    WHERE date BETWEEN '2017-01-01' AND '2017-12-31';
+    WHERE date <= '2018-01-01 00:00:00';
+
+        sum    
+    -----------
+     1986.0000
+    (1 row)
+
+
+    ------------------------
+
+    Also - checked this was a correct sum total since all of the entries are within the date 2017, I ran this code:
+
+    SELECT SUM(amount)
+    FROM donations;
+
+          sum    
+      -----------
+       1986.0000
+      (1 row)
+
+    ------------------------
 
   + The total donations over time per donor (e.g. if Tanysha has donated 3 times with the amounts $25, $30, and $50, then the result would be | Tanysha | 105 |).
+
     SELECT SUM(amount) AS total_donations, donor
     FROM donations
     GROUP BY donor;
 
+     total_donations |   donor    
+    -----------------+------------
+             60.0000 | Ygritte
+            120.0000 | Arya
+            140.0000 | Petyr
+            240.0000 | Margaery
+             50.0000 | Jon
+             20.0000 | Daario
+            100.0000 | Tormund
+             66.0000 | Sansa
+             40.0000 | Samwell
+             90.0000 | Melisandre
+            346.0000 | Daenerys
+             40.0000 | Bronn
+            240.0000 | Tyrion
+             14.0000 | Gilly
+             40.0000 | Theon
+            150.0000 | Brienne
+             50.0000 | Bran
+            180.0000 | Missandei
+    (18 rows)
+
+    ------------------------
+
   + The average donation per donor.
+
     SELECT AVG(amount) AS average_donation_per_donor
     FROM donations
     GROUP BY donor;
 
+      average_donation_per_donor 
+      ----------------------------
+              30.0000000000000000
+              20.0000000000000000
+              70.0000000000000000
+             120.0000000000000000
+              25.0000000000000000
+              10.0000000000000000
+              50.0000000000000000
+              33.0000000000000000
+              20.0000000000000000
+              45.0000000000000000
+              86.5000000000000000
+              20.0000000000000000
+              40.0000000000000000
+               7.0000000000000000
+              10.0000000000000000
+              75.0000000000000000
+              25.0000000000000000
+              22.5000000000000000
+      (18 rows)
+
+    ------------------------
+
   + The number of donations over $100.
+
     SELECT amount
     FROM donations
     WHERE amount > 100.00;
 
+        amount  
+      ----------
+       102.0000
+       120.0000
+       102.0000
+       120.0000
+      (4 rows)
+
+    ------------------------
+
   + The largest donation received in a single instance from a single donor.
-    SELECT MAX(amount)
-    FROM donations;
+
+      SELECT MAX(amount)
+      FROM donations;
+         max    
+      ----------
+       120.0000
+      (1 row)
+
+      Since I knew the highest amount I was able to use this in my HAVING cluse which needed to be boolean.
+      "ERROR:  argument of HAVING must be type boolean, not type numeric"
+
+      SELECT donor, MAX(amount)
+      FROM donations
+      GROUP BY donor
+      HAVING MAX(amount) >= 120;
+
+        donor   |   max    
+      ----------+----------
+       Margaery | 120.0000
+      (1 row)
+
+
+    ------------------------
 
   + The smallest donation received.
+
     SELECT MIN(amount)
     FROM donations;
+
+        min   
+      --------
+       5.0000
+      (1 row)
+
+      Same goes for this clause, I already knew the MIN(amount), so I could use this as a boolean in my HAVING clause.
+
+      SELECT donor, MIN(amount)
+      FROM donations
+      GROUP BY donor
+      HAVING MIN(amount) <= 5;
+
+       donor |  min   
+      -------+--------
+       Theon | 5.0000
+      (1 row)
 
 -----------------------------
 
@@ -83,7 +204,6 @@
     2. "For me, it is not about a "common aggregation problem", but just about an incorrect SQL query. The single correct answer for "select the maximum avg for each cname..." is"
     https://stackoverflow.com/questions/19601948/must-appear-in-the-group-by-clause-or-be-used-in-an-aggregate-function
 
-
  -----------------------------
 
 8. Follow the instructions for the scenarios below:
@@ -106,15 +226,18 @@
     WHERE age > 2 AND gender='F';
 
   + From the donations table (from problem #2), find the top 5 donors with the highest cumulative donation amounts to be honored as “Platinum Donors”.
-    SELECT donor, amount
+
+    SELECT DISTINCT donor, SUM(amount)
     FROM donations
-    ORDER BY amount DESC
+    GROUP BY donor
+    ORDER BY 2 DESC
     LIMIT 5;
 
   + From the donations table (from problem #2), find donors 6-15 with the next highest cumulative donation amounts to be honored as “Gold Donors”.
-    SELECT donor, amount
+    SELECT DISTINCT donor, SUM(amount
     FROM donations
-    ORDER BY amount DESC
+    GROUP BY donor
+    ORDER BY 2 DESC
     LIMIT 10 OFFSET 5;
 
 
