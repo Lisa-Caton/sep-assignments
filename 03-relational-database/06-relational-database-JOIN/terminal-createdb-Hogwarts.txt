@@ -1,0 +1,294 @@
+Last login: Tue Mar  5 10:51:53 on ttys001
+lcaton-mbp:03-relational-database lcaton$ createdb -U postgres -w Hogwarts
+lcaton-mbp:03-relational-database lcaton$ psql Hogwarts postgres
+psql (10.4, server 11.2)
+WARNING: psql major version 10, server major version 11.
+         Some psql features might not work.
+Type "help" for help.
+
+Hogwarts=# CREATE TABLE professor(id integer, name text, department_id integer);
+CREATE TABLE
+Hogwarts=# COPY professor FROM '06-relational-database-JOIN/hogwarts-professor.csv' DELIMITER ',' CSV;
+ERROR:  could not open file "06-relational-database-JOIN/hogwarts-professor.csv" for reading: No such file or directory
+HINT:  COPY FROM instructs the PostgreSQL server process to read a file. You may want a client-side facility such as psql's \copy.
+Hogwarts=# COPY professor FROM 'Users/lcaton/bloc/sep-assignments/03-relational-database/06-relational-database-JOIN/hogwarts-professor.csv' DELIMITER ',' CSV;
+ERROR:  could not open file "Users/lcaton/bloc/sep-assignments/03-relational-database/06-relational-database-JOIN/hogwarts-professor.csv" for reading: No such file or directory
+HINT:  COPY FROM instructs the PostgreSQL server process to read a file. You may want a client-side facility such as psql's \copy.
+Hogwarts=# COPY professor FROM '/Users/lcaton/bloc/sep-assignments/03-relational-database/06-relational-database-JOIN/hogwarts-professor.csv' DELIMITER ',' CSV;
+COPY 6
+Hogwarts=# SELECT * FROM professor;
+ id |           name           | department_id 
+----+--------------------------+---------------
+  1 | Albus Dumbledore         |            31
+  2 | Severus Snape            |            32
+  3 | Dolores Umbridge         |            32
+  4 | Bathsheda Babbling       |            34
+  5 | Rubeus Hagrid            |            35
+  6 | Wilhelmina Grubbly-Plank |            35
+(6 rows)
+
+Hogwarts=# COPY professor FROM '/Users/lcaton/bloc/sep-assignments/03-relational-database/06-relational-database-JOIN/hogwarts-department.csv' DELIMITER ',' CSV;
+ERROR:  missing data for column "department_id"
+CONTEXT:  COPY professor, line 1: "31,Transfiguration"
+Hogwarts=# SELECT * FROM department;
+ERROR:  relation "department" does not exist
+LINE 1: SELECT * FROM department;
+                      ^
+Hogwarts=# CREATE TABLE department(id integer, name text);
+CREATE TABLE
+Hogwarts=# COPY professor FROM '/Users/lcaton/bloc/sep-assignments/03-relational-database/06-relational-database-JOIN/hogwarts-department.csv' DELIMITER ',' CSV;
+ERROR:  missing data for column "department_id"
+CONTEXT:  COPY professor, line 1: "31,Transfiguration"
+Hogwarts=# SELECT * department;
+ERROR:  syntax error at or near "department"
+LINE 1: SELECT * department;
+                 ^
+Hogwarts=# SELECT * FROM department;
+ id | name 
+----+------
+(0 rows)
+
+Hogwarts=# COPY department FROM '/Users/lcaton/bloc/sep-assignments/03-relational-database/06-relational-database-JOIN/hogwarts-department.csv' DELIMITER ',' CSV;
+COPY 5
+Hogwarts=# SELECT * FROM department;
+ id |             name              
+----+-------------------------------
+ 31 | Transfiguration
+ 32 | Defence Against the Dark Arts
+ 33 | Flying
+ 34 | Study of Ancient Runes
+ 35 | Care of Magical Creatures
+(5 rows)
+
+Hogwarts=# SELECT professor.name, department.name FROM professor JOIN department ON professor.department_id = department.id;
+           name           |             name              
+--------------------------+-------------------------------
+ Albus Dumbledore         | Transfiguration
+ Severus Snape            | Defence Against the Dark Arts
+ Dolores Umbridge         | Defence Against the Dark Arts
+ Bathsheda Babbling       | Study of Ancient Runes
+ Rubeus Hagrid            | Care of Magical Creatures
+ Wilhelmina Grubbly-Plank | Care of Magical Creatures
+(6 rows)
+
+Hogwarts=# CREATE TABLE compensation(id integer, professor_id integer, salary integer, vacation_days integer);
+CREATE TABLE
+Hogwarts=# COPY compensation FROM '/Users/lcaton/bloc/sep-assignments/03-relational-database/06-relational-database-JOIN/hogwarts-compensation.csv' DELIMITER ',' CSV;
+COPY 6
+Hogwarts=# SELECT * FROM compensation;
+ id | professor_id | salary | vacation_days 
+----+--------------+--------+---------------
+  1 |            1 |  64000 |             2
+  2 |            2 |  35000 |             8
+  3 |            3 |  56750 |            10
+  4 |            4 |  42950 |             8
+  5 |            5 |  30000 |             4
+  6 |            6 | 102750 |            22
+(6 rows)
+
+Hogwarts=# SELECT professor.name, department.name, compensation.vacation_days FROM professor JOIN department ON professor.department_id = department.id JOIN compensation ON professor.id = compensation.professor_id;
+           name           |             name              | vacation_days 
+--------------------------+-------------------------------+---------------
+ Albus Dumbledore         | Transfiguration               |             2
+ Severus Snape            | Defence Against the Dark Arts |             8
+ Dolores Umbridge         | Defence Against the Dark Arts |            10
+ Bathsheda Babbling       | Study of Ancient Runes        |             8
+ Rubeus Hagrid            | Care of Magical Creatures     |             4
+ Wilhelmina Grubbly-Plank | Care of Magical Creatures     |            22
+(6 rows)
+
+Hogwarts=# UPDATE Professor SET department_id = null WHERE id=1;
+UPDATE 1
+Hogwarts=# SELECT * FROM professor;
+ id |           name           | department_id 
+----+--------------------------+---------------
+  2 | Severus Snape            |            32
+  3 | Dolores Umbridge         |            32
+  4 | Bathsheda Babbling       |            34
+  5 | Rubeus Hagrid            |            35
+  6 | Wilhelmina Grubbly-Plank |            35
+  1 | Albus Dumbledore         |              
+(6 rows)
+
+Hogwarts=# SELECT department.name, professor.name FROM department LEFT OUTER JOIN professor ON professor.department_id = department.id;
+             name              |           name           
+-------------------------------+--------------------------
+ Transfiguration               | 
+ Defence Against the Dark Arts | Severus Snape
+ Defence Against the Dark Arts | Dolores Umbridge
+ Flying                        | 
+ Study of Ancient Runes        | Bathsheda Babbling
+ Care of Magical Creatures     | Rubeus Hagrid
+ Care of Magical Creatures     | Wilhelmina Grubbly-Plank
+(7 rows)
+
+Hogwarts=# SELECT professor.name, department.name FROM department RIGHT OUTER JOIN professor ON professor.department_id = department.id;
+           name           |             name              
+--------------------------+-------------------------------
+ Severus Snape            | Defence Against the Dark Arts
+ Dolores Umbridge         | Defence Against the Dark Arts
+ Bathsheda Babbling       | Study of Ancient Runes
+ Rubeus Hagrid            | Care of Magical Creatures
+ Wilhelmina Grubbly-Plank | Care of Magical Creatures
+ Albus Dumbledore         | 
+(6 rows)
+
+Hogwarts=# INSERT INTO professor (name) VALUES ("Minerva McGonagall");
+ERROR:  column "Minerva McGonagall" does not exist
+LINE 1: INSERT INTO professor (name) VALUES ("Minerva McGonagall");
+                                             ^
+Hogwarts=# INSERT INTO professor (name) VALUES ('Minerva McGonagall');
+INSERT 0 1
+Hogwarts=# SELECT professor.name, department.name FROM department FULL OUTER JOIN professor ON professor.department_id = department.id;
+           name           |             name              
+--------------------------+-------------------------------
+                          | Transfiguration
+ Severus Snape            | Defence Against the Dark Arts
+ Dolores Umbridge         | Defence Against the Dark Arts
+                          | Flying
+ Bathsheda Babbling       | Study of Ancient Runes
+ Rubeus Hagrid            | Care of Magical Creatures
+ Wilhelmina Grubbly-Plank | Care of Magical Creatures
+ Albus Dumbledore         | 
+ Minerva McGonagall       | 
+(9 rows)
+
+Hogwarts=# SELECT * FROM professor CROSS JOIN department;
+ id |           name           | department_id | id |             name              
+----+--------------------------+---------------+----+-------------------------------
+  2 | Severus Snape            |            32 | 31 | Transfiguration
+  3 | Dolores Umbridge         |            32 | 31 | Transfiguration
+  4 | Bathsheda Babbling       |            34 | 31 | Transfiguration
+  5 | Rubeus Hagrid            |            35 | 31 | Transfiguration
+  6 | Wilhelmina Grubbly-Plank |            35 | 31 | Transfiguration
+  1 | Albus Dumbledore         |               | 31 | Transfiguration
+    | Minerva McGonagall       |               | 31 | Transfiguration
+  2 | Severus Snape            |            32 | 32 | Defence Against the Dark Arts
+  3 | Dolores Umbridge         |            32 | 32 | Defence Against the Dark Arts
+  4 | Bathsheda Babbling       |            34 | 32 | Defence Against the Dark Arts
+  5 | Rubeus Hagrid            |            35 | 32 | Defence Against the Dark Arts
+  6 | Wilhelmina Grubbly-Plank |            35 | 32 | Defence Against the Dark Arts
+  1 | Albus Dumbledore         |               | 32 | Defence Against the Dark Arts
+    | Minerva McGonagall       |               | 32 | Defence Against the Dark Arts
+  2 | Severus Snape            |            32 | 33 | Flying
+  3 | Dolores Umbridge         |            32 | 33 | Flying
+  4 | Bathsheda Babbling       |            34 | 33 | Flying
+  5 | Rubeus Hagrid            |            35 | 33 | Flying
+  6 | Wilhelmina Grubbly-Plank |            35 | 33 | Flying
+  1 | Albus Dumbledore         |               | 33 | Flying
+    | Minerva McGonagall       |               | 33 | Flying
+  2 | Severus Snape            |            32 | 34 | Study of Ancient Runes
+  3 | Dolores Umbridge         |            32 | 34 | Study of Ancient Runes
+  4 | Bathsheda Babbling       |            34 | 34 | Study of Ancient Runes
+  5 | Rubeus Hagrid            |            35 | 34 | Study of Ancient Runes
+  6 | Wilhelmina Grubbly-Plank |            35 | 34 | Study of Ancient Runes
+  1 | Albus Dumbledore         |               | 34 | Study of Ancient Runes
+    | Minerva McGonagall       |               | 34 | Study of Ancient Runes
+  2 | Severus Snape            |            32 | 35 | Care of Magical Creatures
+  3 | Dolores Umbridge         |            32 | 35 | Care of Magical Creatures
+  4 | Bathsheda Babbling       |            34 | 35 | Care of Magical Creatures
+  5 | Rubeus Hagrid            |            35 | 35 | Care of Magical Creatures
+  6 | Wilhelmina Grubbly-Plank |            35 | 35 | Care of Magical Creatures
+  1 | Albus Dumbledore         |               | 35 | Care of Magical Creatures
+    | Minerva McGonagall       |               | 35 | Care of Magical Creatures
+(35 rows)
+
+Hogwarts=# SELECT * FROM department CROSS JOIN professor;
+ id |             name              | id |           name           | department_id 
+----+-------------------------------+----+--------------------------+---------------
+ 31 | Transfiguration               |  2 | Severus Snape            |            32
+ 31 | Transfiguration               |  3 | Dolores Umbridge         |            32
+ 31 | Transfiguration               |  4 | Bathsheda Babbling       |            34
+ 31 | Transfiguration               |  5 | Rubeus Hagrid            |            35
+ 31 | Transfiguration               |  6 | Wilhelmina Grubbly-Plank |            35
+ 31 | Transfiguration               |  1 | Albus Dumbledore         |              
+ 31 | Transfiguration               |    | Minerva McGonagall       |              
+ 32 | Defence Against the Dark Arts |  2 | Severus Snape            |            32
+ 32 | Defence Against the Dark Arts |  3 | Dolores Umbridge         |            32
+ 32 | Defence Against the Dark Arts |  4 | Bathsheda Babbling       |            34
+ 32 | Defence Against the Dark Arts |  5 | Rubeus Hagrid            |            35
+ 32 | Defence Against the Dark Arts |  6 | Wilhelmina Grubbly-Plank |            35
+ 32 | Defence Against the Dark Arts |  1 | Albus Dumbledore         |              
+ 32 | Defence Against the Dark Arts |    | Minerva McGonagall       |              
+ 33 | Flying                        |  2 | Severus Snape            |            32
+ 33 | Flying                        |  3 | Dolores Umbridge         |            32
+ 33 | Flying                        |  4 | Bathsheda Babbling       |            34
+ 33 | Flying                        |  5 | Rubeus Hagrid            |            35
+ 33 | Flying                        |  6 | Wilhelmina Grubbly-Plank |            35
+ 33 | Flying                        |  1 | Albus Dumbledore         |              
+ 33 | Flying                        |    | Minerva McGonagall       |              
+ 34 | Study of Ancient Runes        |  2 | Severus Snape            |            32
+ 34 | Study of Ancient Runes        |  3 | Dolores Umbridge         |            32
+ 34 | Study of Ancient Runes        |  4 | Bathsheda Babbling       |            34
+ 34 | Study of Ancient Runes        |  5 | Rubeus Hagrid            |            35
+ 34 | Study of Ancient Runes        |  6 | Wilhelmina Grubbly-Plank |            35
+ 34 | Study of Ancient Runes        |  1 | Albus Dumbledore         |              
+ 34 | Study of Ancient Runes        |    | Minerva McGonagall       |              
+ 35 | Care of Magical Creatures     |  2 | Severus Snape            |            32
+ 35 | Care of Magical Creatures     |  3 | Dolores Umbridge         |            32
+ 35 | Care of Magical Creatures     |  4 | Bathsheda Babbling       |            34
+ 35 | Care of Magical Creatures     |  5 | Rubeus Hagrid            |            35
+ 35 | Care of Magical Creatures     |  6 | Wilhelmina Grubbly-Plank |            35
+ 35 | Care of Magical Creatures     |  1 | Albus Dumbledore         |              
+ 35 | Care of Magical Creatures     |    | Minerva McGonagall       |              
+(35 rows)
+
+Hogwarts=# SELECT * FROM professor CROSS JOIN department ORDER BY id;
+ERROR:  ORDER BY "id" is ambiguous
+LINE 1: SELECT * FROM professor CROSS JOIN department ORDER BY id;
+                                                               ^
+Hogwarts=# SELECT * FROM professor CROSS JOIN department ORDER BY (id);
+ERROR:  ORDER BY "id" is ambiguous
+LINE 1: SELECT * FROM professor CROSS JOIN department ORDER BY (id);
+                                                                ^
+Hogwarts=# SELECT * FROM professor CROSS JOIN department ORDER BY (professor.id);
+ id |           name           | department_id | id |             name              
+----+--------------------------+---------------+----+-------------------------------
+  1 | Albus Dumbledore         |               | 31 | Transfiguration
+  1 | Albus Dumbledore         |               | 35 | Care of Magical Creatures
+  1 | Albus Dumbledore         |               | 34 | Study of Ancient Runes
+  1 | Albus Dumbledore         |               | 32 | Defence Against the Dark Arts
+  1 | Albus Dumbledore         |               | 33 | Flying
+  2 | Severus Snape            |            32 | 33 | Flying
+  2 | Severus Snape            |            32 | 31 | Transfiguration
+  2 | Severus Snape            |            32 | 34 | Study of Ancient Runes
+  2 | Severus Snape            |            32 | 32 | Defence Against the Dark Arts
+  2 | Severus Snape            |            32 | 35 | Care of Magical Creatures
+  3 | Dolores Umbridge         |            32 | 31 | Transfiguration
+  3 | Dolores Umbridge         |            32 | 35 | Care of Magical Creatures
+  3 | Dolores Umbridge         |            32 | 32 | Defence Against the Dark Arts
+  3 | Dolores Umbridge         |            32 | 33 | Flying
+  3 | Dolores Umbridge         |            32 | 34 | Study of Ancient Runes
+  4 | Bathsheda Babbling       |            34 | 31 | Transfiguration
+  4 | Bathsheda Babbling       |            34 | 35 | Care of Magical Creatures
+  4 | Bathsheda Babbling       |            34 | 32 | Defence Against the Dark Arts
+  4 | Bathsheda Babbling       |            34 | 34 | Study of Ancient Runes
+  4 | Bathsheda Babbling       |            34 | 33 | Flying
+  5 | Rubeus Hagrid            |            35 | 33 | Flying
+  5 | Rubeus Hagrid            |            35 | 31 | Transfiguration
+  5 | Rubeus Hagrid            |            35 | 32 | Defence Against the Dark Arts
+  5 | Rubeus Hagrid            |            35 | 34 | Study of Ancient Runes
+  5 | Rubeus Hagrid            |            35 | 35 | Care of Magical Creatures
+  6 | Wilhelmina Grubbly-Plank |            35 | 34 | Study of Ancient Runes
+  6 | Wilhelmina Grubbly-Plank |            35 | 33 | Flying
+  6 | Wilhelmina Grubbly-Plank |            35 | 32 | Defence Against the Dark Arts
+  6 | Wilhelmina Grubbly-Plank |            35 | 35 | Care of Magical Creatures
+  6 | Wilhelmina Grubbly-Plank |            35 | 31 | Transfiguration
+    | Minerva McGonagall       |               | 31 | Transfiguration
+    | Minerva McGonagall       |               | 35 | Care of Magical Creatures
+    | Minerva McGonagall       |               | 34 | Study of Ancient Runes
+    | Minerva McGonagall       |               | 32 | Defence Against the Dark Arts
+    | Minerva McGonagall       |               | 33 | Flying
+(35 rows)
+
+Hogwarts=# SELECT professor.name, department.name FROM professor, department WHERE professor.department_id = department.id;
+           name           |             name              
+--------------------------+-------------------------------
+ Severus Snape            | Defence Against the Dark Arts
+ Dolores Umbridge         | Defence Against the Dark Arts
+ Bathsheda Babbling       | Study of Ancient Runes
+ Rubeus Hagrid            | Care of Magical Creatures
+ Wilhelmina Grubbly-Plank | Care of Magical Creatures
+(5 rows)
+
+Hogwarts=# 
