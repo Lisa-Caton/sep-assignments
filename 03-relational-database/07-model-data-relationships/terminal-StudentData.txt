@@ -1,0 +1,71 @@
+Last login: Fri Mar 15 15:56:38 on ttys002
+lcaton-mbp:07-model-data-relationships lcaton$ psql -f StudentData.sql StudentData postgres
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+INSERT 0 13
+INSERT 0 6
+INSERT 0 13
+lcaton-mbp:07-model-data-relationships lcaton$ psql StudentData postgres
+psql (10.4, server 11.2)
+WARNING: psql major version 10, server major version 11.
+         Some psql features might not work.
+Type "help" for help.
+
+StudentData=# SELECT * FROM students;
+  id  |      name      |           email            
+------+----------------+----------------------------
+ 1001 | Max Roy        | maxroy12@aol.com
+ 2002 | Leon Day       | leonday5@gmail.com
+ 3003 | Carol Sings    | carolsings2005@hotmail.com
+ 4004 | Alex Jack      | alexjack@aol.com
+ 5005 | Topanga Blue   | tblue2004@hotmail.com
+ 6006 | Sean Scott     | ss1982@hotmail.com
+ 7001 | Adam Smith     | adamsmith007@gmail.com
+ 8001 | Shirley Katz   | shirlkatxz@gmail.com
+ 9001 | Andrew Dominon | andrewdomino@hotmail.com
+ 1010 | Amelia Evelyn  | ameliaeve@gmail.com
+ 1111 | Charlie Baxter | charliebaxter@gmail.com
+ 1212 | Emma Tone      | msstoneusa@gmail.com
+ 1313 | Sarah Keys     | sarahkeys@gmail.com
+(13 rows)
+
+StudentData=# SELECT * FROM classes;
+ id  |  name   |             description             
+-----+---------+-------------------------------------
+ 101 | Math    | learning algorithms
+ 102 | Science | explore the world like Christopher!
+ 103 | History | War of 1812
+ 104 | Spanish | learn spanish
+ 105 | French  | learn french
+ 106 | English | learn Anglo-Saxons
+(6 rows)
+
+StudentData=# SELECT * FROM grades;
+ id | classes_id | students_id | letter_grade 
+----+------------+-------------+--------------
+  1 |        101 |        1001 | A
+  1 |        103 |        2002 | B
+  1 |        104 |        3003 | C
+  1 |        104 |        4004 | D
+  1 |        101 |        5005 | E
+  1 |        101 |        6006 | F
+  1 |        102 |        7001 | A
+  1 |        105 |        8001 | B
+  1 |        102 |        9001 | B
+  1 |        103 |        1010 | A
+  1 |        106 |        1111 | B
+  1 |        102 |        1212 | B
+  1 |        105 |        1313 | B
+(13 rows)
+
+StudentData=# 
+
+
+
+
+
+
+
+
+
