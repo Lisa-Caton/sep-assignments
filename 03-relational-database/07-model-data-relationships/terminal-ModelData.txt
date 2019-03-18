@@ -1,0 +1,15 @@
+Last login: Fri Mar 15 12:29:43 on ttys001
+lcaton-mbp:07-model-data-relationships lcaton$ psql -f ModelData.sql ModelData postgres
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+INSERT 0 5
+INSERT 0 5
+INSERT 0 9
+lcaton-mbp:07-model-data-relationships lcaton$ psql ModelData postgres
+psql (10.4, server 11.2)
+WARNING: psql major version 10, server major version 11.
+         Some psql features might not work.
+Type "help" for help.
+
+ModelData=# 
