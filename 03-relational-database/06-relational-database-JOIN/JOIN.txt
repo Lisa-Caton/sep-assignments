@@ -53,7 +53,7 @@
       Albert              2019-05-26
                           2016-01-12
 
-	------------------------------
+  ------------------------------
 
 
 3. Define primary key and foreign key. Give a real world example for each.
@@ -94,7 +94,7 @@
     FULL OUTER JOIN shifts
     ON employees.id = shifts.id;
 
-	
+
 8. Using this Adoption schema and data, please write queries to retrieve the following information and include the results:
   + All volunteers. If the volunteer is fostering a dog, include each dog as well.
 
@@ -103,12 +103,12 @@
     LEFT OUTER JOIN dogs
     ON volunteers.foster_dog_id = dogs.id;
 
-		first_name      available_to_foster         name
-		  Rubeus              true                Munchkin
-		  Marjorie            true                Marmaduke
-		  Sirius              true                  null
-		  Remus               true                  null
-		  Albus               false                 null
+      first_name      available_to_foster     name
+      Rubeus              true                Munchkin
+      Marjorie            true                Marmaduke
+      Sirius              true                null
+      Remus               true                null
+      Albus               false               null
 
 
     ------------------------------
@@ -123,9 +123,9 @@
     ON a.id = ca.adopter_id
     WHERE ca.date > CURRENT_DATE - INTERVAL '30 DAYS';
 
-		cats_name     human_first_name      human_last_name             date
-		  Mushi           Arabella              Figg            2019-02-16T00:00:00.000Z
-		  Victoire        Argus                 Filch           2019-02-21T00:00:00.000Z
+    cats_name     human_first_name      human_last_name       date
+    Mushi         Arabella              Figg                  2019-02-16T00:00:00.000Z
+    Victoire      Argus                 Filch                 2019-02-21T00:00:00.000Z
 
 
     ------------------------------
@@ -136,140 +136,150 @@
     FROM dogs AS d
     CROSS JOIN adopters AS a;
 
-		adpoters_name	dogs_name
-		Hermione	Boujee
-		Arabella	Boujee
-		Argus	Boujee
-		Hermione	Munchkin
-		Arabella	Munchkin
-		Argus	Munchkin
-		Hermione	Marley
-		Arabella	Marley
-		Argus	Marley
-		Hermione	Lassie
-		Arabella	Lassie
-		Argus	Lassie
-		Hermione	Marmaduke
-		Arabella	Marmaduke
-		Argus	Marmaduke
-		Hermione	Rosco
-		Arabella	Rosco
-		Argus	Rosco
+    adpoters_name    dogs_name
+    Hermione         Boujee
+    Arabella         Boujee
+    Argus            Boujee
+    Hermione         Munchkin
+    Arabella         Munchkin
+    Argus            Munchkin
+    Hermione         Marley
+    Arabella         Marley
+    Argus            Marley
+    Hermione         Lassie
+    Arabella         Lassie
+    Argus            Lassie
+    Hermione         Marmaduke
+    Arabella         Marmaduke
+    Argus            Marmaduke
+    Hermione         Rosco
+    Arabella         Rosco
+    Argus            Rosco
 
 
     ------------------------------
 
   + Lists of all cats and all dogs who have not been adopted.
 
-	SELECT dogs.id AS dogs_ID, dogs.name AS dogs_name, dog_adoptions.adopter_id,
-		cats.id AS cats_ID, cats.name AS cats_name, cat_adoptions.adopter_id
-	FROM dogs
-	LEFT OUTER JOIN dog_adoptions ON dogs.id = dog_adoptions.dog_id
-	LEFT OUTER JOIN adopters ON dog_adoptions.adopter_id = adopters.id
-	LEFT OUTER JOIN cat_adoptions ON adopters.id = cat_adoptions.cat_id
-	LEFT OUTER JOIN cats ON cat_adoptions.cat_id = cats.id
-	WHERE adopters.id IS NULL;
-	
-		dogs_id	dogs_name	adopter_id	cats_id		cats_name	adopter_id
-		10002	Munchkin	null		null		null		null
-		10001	Boujee		null		null		null		null
-		10003	Lassie		null		null		null		null
-		10004	Marley		null		null		null		null
-		10006	Marmaduke	null		null		null		null
-		
-		
+    SELECT dogs.name AS Dogs_Name,
+    cats.name AS Cats_Name
+    FROM dogs
+    LEFT JOIN dog_adoptions ON dogs.id =  dog_adoptions.dog_id
+    FULL JOIN adopters ON dog_adoptions.adopter_ID = adopters.id
+    FULL JOIN cat_adoptions ON adopters.id = cat_adoptions.adopter_id
+    FULL JOIN cats ON cat_adoptions.cat_id = cats.id
+    WHERE dog_adoptions.dog_id IS NULL AND cats.adoption_date IS NULL;
+
+
+      dogs_name     cats_name
+      null          Azul
+      null          Mushi
+      Marmaduke     null
+      Marley        null
+      Lassie        null
+      Boujee        null
+      Munchkin      null
+      null          Seashell
+      null          Nala
+
+      /*
+      Break-down:
+      SELECT dogs.name, dog_adoptions.dog_id
+      FROM dogs
+      LEFT JOIN dog_adoptions ON dogs.id =  dog_adoptions.dog_id
+      WHERE dog_id IS NULL;
+
+      SELECT cats.name, adoption_date
+      FROM cats
+      WHERE adoption_date IS NULL;
+      */
+
     ------------------------------
 
   + Volunteers who are available to foster. If they currently are fostering a dog, include the dog. Also include all dogs who are not currently in foster homes.
-  
-	SELECT  volunteers.available_to_foster AS Available_to_Foster, volunteers.first_name AS Volunteers_Name, volunteers.foster_dog_id AS Dogs_foster_id, dogs.name AS Dogs_Name
-	From dogs 
-	RIGHT OUTER JOIN volunteers ON dogs.id = volunteers.foster_dog_id
-	WHERE volunteers.available_to_foster IS TRUE;
-	
-		available_to_foster	volunteers_name		dogs_foster_id		dogs_name
-				true			Rubeus				10002			Munchkin
-				true			Marjorie			10006			Marmaduke
-				true			Sirius				null			null
-				true			Remus				null			null
-	
-				
+
+    SELECT  volunteers.available_to_foster AS Available_to_Foster, volunteers.first_name AS Volunteers_Name, volunteers.foster_dog_id AS Dogs_foster_id, dogs.name AS Dogs_Name
+    From dogs 
+    RIGHT OUTER JOIN volunteers ON dogs.id = volunteers.foster_dog_id
+    WHERE volunteers.available_to_foster IS TRUE;
+
+      available_to_foster   Volunteers_Name     dogs_foster_id    dogs_name
+      true                  Rubeus              10002             Munchkin
+      true                  10006               Marma             duke
+      true                  Sirius              null              null
+      true                  Remus               null              null
+
+
     ------------------------------
 
   + The name of the person who adopted Rosco.
-  
-	SELECT adopters.first_name AS adopters_Name, dogs.name AS Dogs_Name
-	FROM dogs
-	JOIN dog_adoptions ON dogs.id = dog_adoptions.dog_id
-	JOIN adopters ON dog_adoptions.adopter_id = adopters.id
-	WHERE dogs.name = 'Rosco';
-	
-		adopters_name	dogs_name
-		Argus	Rosco
 
-	
+    SELECT adopters.first_name AS adopters_Name, dogs.name AS Dogs_Name
+    FROM dogs
+    JOIN dog_adoptions ON dogs.id = dog_adoptions.dog_id
+    JOIN adopters ON dog_adoptions.adopter_id = adopters.id
+    WHERE dogs.name = 'Rosco';
+
+     adopters_name    dogs_name
+     Argus Rosco
+
+
+    ------------------------------
+
 9. Using this Library schema and data, write queries applying the following scenarios:
 
   + To determine if the library should buy more copies of a given book, please provide the names and position, in order, of all of the patrons with a hold (request for a book with all copies checked out) on "Advanced Potion-Making".
-  
-	SELECT books.title, holds.rank, patrons.name
-	FROM books
-	JOIN holds ON books.isbn = holds.isbn
-	JOIN patrons ON holds.patron_id = patrons.id
-	WHERE title = 'Advanced Potion-Making'
-	ORDER BY holds.rank;
-  
-  
-      ------------------------------
-      
-  + Make a list of all book titles and denote whether or not a copy of that book is checked out.
-  
-	SELECT books.title, transactions.checked_out_date, transactions.checked_in_date
-	FROM books
-	JOIN transactions ON books.isbn = transactions.isbn
-	ORDER BY books.title;
-  
-  
-      ------------------------------
-      
-  + In an effort to learn which books take longer to read, the librarians would like you to create a list of average checked out time by book name in the past month.
-  
-	SELECT books.title, AVG(transactions.checked_in_date - transactions.checked_out_date) 
-	FROM books
-	JOIN transactions ON books.isbn = transactions.isbn
-	WHERE transactions.checked_out_date < CURRENT_DATE - INTERVAL '30 DAYS' AND transactions.checked_in_date IS NOT NULL
-	GROUP BY books.title;
-  
+
+    SELECT books.title, holds.rank, patrons.name
+    FROM books
+    JOIN holds ON books.isbn = holds.isbn
+    JOIN patrons ON holds.patron_id = patrons.id
+    WHERE title = 'Advanced Potion-Making'
+    ORDER BY holds.rank;
+
 
       ------------------------------
-  
-  + In order to learn which items should be retired, make a list of all books that have not been checked out in the past 5 years.
-  
-	SELECT 	books.title, 
-	transactions.checked_out_date
-	FROM books
-	LEFT OUTER JOIN transactions 
-	ON transactions.isbn = books.isbn
-	GROUP BY books.title, books.isbn, transactions.checked_out_date
-	HAVING transactions.checked_out_date < CURRENT_DATE - INTERVAL '5 YEARS';
-      
+
+  + Make a list of all book titles and denote whether or not a copy of that book is checked out.
+
+    SELECT books.title, transactions.checked_out_date, transactions.checked_in_date
+    FROM books
+    RIGHT JOIN transactions ON books.isbn = transactions.isbn
+    WHERE transactions.checked_in_date IS NULL;
+
+
       ------------------------------
-      
+
+  + In an effort to learn which books take longer to read, the librarians would like you to create a list of average checked out time by book name in the past month.
+
+    SELECT books.title, AVG(transactions.checked_in_date - transactions.checked_out_date) 
+    FROM books
+    JOIN transactions ON books.isbn = transactions.isbn
+    WHERE transactions.checked_out_date < CURRENT_DATE - INTERVAL '30 DAYS' AND transactions.checked_in_date IS NOT NULL
+    GROUP BY books.title;
+
+
+      ------------------------------
+
+  + In order to learn which items should be retired, make a list of all books that have not been checked out in the past 5 years.
+
+    SELECT books.title,
+    transactions.checked_out_date
+    FROM books
+    LEFT OUTER JOIN transactions
+    ON transactions.isbn = books.isbn
+    GROUP BY books.title, books.isbn, transactions.checked_out_date
+    HAVING transactions.checked_out_date < CURRENT_DATE - INTERVAL '5 YEARS';
+
+
+      ------------------------------
+
   + List all of the library patrons. If they have one or more books checked out, correspond the books to the patrons.
 
-	SELECT 	p.id, 
-	p.name, 
-	t.isbn, 
-	b.title, 
-	t.checked_out_date, 
-	t.checked_in_date
-	FROM patrons AS p
-	RIGHT OUTER JOIN transactions AS t 
-	ON p.id = t.patron_id
-	RIGHT OUTER JOIN books AS b 
-	ON b.isbn = t.isbn
-	ORDER BY p.id;
-  
-    
-      
-  
+    SELECT p.id, p.name, t.isbn, b.title, t.checked_out_date, t.checked_in_date
+    FROM patrons AS p
+    RIGHT OUTER JOIN transactions AS t 
+    ON p.id = t.patron_id
+    RIGHT OUTER JOIN books AS b 
+    ON b.isbn = t.isbn
+    ORDER BY p.id;
