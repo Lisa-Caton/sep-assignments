@@ -50,23 +50,19 @@ QUESTION 1:
 
 + The number of unique guests who have booked the same room.
 
-    SELECT DISTINCT booking.guest_ID, booking.room_ID, guest.first_name, guest.last_name, booking.check_in_date
-    FROM guest
-    JOIN booking ON guest.guest_ID = booking.guest_ID
-    WHERE booking.room_ID > 1
-    ORDER BY booking.room_ID ASC;
+  SELECT DISTINCT(guest.first_name), COUNT(booking.room_id)
+  FROM guest
+  JOIN booking ON guest.guest_ID = booking.guest_ID
+  GROUP BY guest.first_name;
 
-
-     guest_id | room_id | first_name | last_name | check_in_date 
-    ----------+---------+------------+-----------+---------------
-         2002 |       2 | Kelly      | Angel     | 2016-02-02
-         3003 |       3 | Carl       | Block     | 2016-01-09
-         3003 |       3 | Carl       | Block     | 2016-03-12
-         3003 |       3 | Carl       | Block     | 2016-04-16
-         3003 |       3 | Carl       | Block     | 2016-05-22
-         4004 |       4 | Bert       | Gamble    | 2016-11-21
-         5005 |       4 | Annie      | Smith     | 2016-06-24
-    (7 rows)
+     first_name | count 
+    ------------+-------
+     Kelly      |     2
+     Bert       |     1
+     Annie      |     1
+     Sarah      |     0
+     Carl       |     4
+    (5 rows)
 
 -------------------
 QUESTION 2:
@@ -97,32 +93,21 @@ QUESTION 3:
 
 + The number of each grade (using letter grades A-F) earned in a particular class.
 
-  SELECT classes.name, grades.letter_grade, COUNT(*)
+  SELECT DISTINCT(classes.name), COUNT(grades.letter_grade)
   FROM grades
   JOIN classes ON grades.classes_ID = classes.ID
-  GROUP BY classes.name, grades.letter_grade
-  HAVING grades.letter_grade = 'A' OR
-  grades.letter_grade = 'B' OR
-  grades.letter_grade = 'C' OR
-  grades.letter_grade = 'D' OR
-  grades.letter_grade = 'E' OR
-  grades.letter_grade = 'F'
-  ORDER BY grades.letter_grade ASC;
+  GROUP BY classes.name
+  ORDER BY classes.name ASC;
 
-      name   | letter_grade | count 
-    ---------+--------------+-------
-     History | A            |     1
-     Math    | A            |     1
-     Science | A            |     1
-     English | B            |     1
-     French  | B            |     2
-     History | B            |     1
-     Science | B            |     2
-     Spanish | C            |     1
-     Spanish | D            |     1
-     Math    | E            |     1
-     Math    | F            |     1
-    (11 rows)
+      name   | count 
+    ---------+-------
+     English |     1
+     French  |     2
+     History |     2
+     Math    |     3
+     Science |     3
+     Spanish |     2
+    (6 rows)
 
 
 + Class names and the total number of students who have taken each class in the list.
@@ -131,51 +116,51 @@ QUESTION 3:
   FROM classes
   JOIN grades ON classes.ID = grades.classes_ID
   JOIN students ON grades.students_ID = students.ID
-  GROUP BY classes.name
-  HAVING COUNT(*) > 1;
+  GROUP BY classes.name;
 
       name   | count 
     ---------+-------
      Math    |     3
+     English |     1
      History |     2
      Spanish |     2
      French  |     2
      Science |     3
-    (5 rows)
+    (6 rows)
 
 
 + The class taken by the largest number of students.
 
-  SELECT classes.name, COUNT(*)
+  SELECT classes.name, COUNT(*) AS num_students
   FROM classes
   JOIN grades ON classes.ID = grades.classes_ID
   JOIN students ON grades.students_ID = students.ID
-  GROUP BY classes.name, students_ID;
+  GROUP BY classes.name
+  ORDER BY num_students DESC, classes.name ASC
+  LIMIT 2;
 
-      name   | count 
-    ---------+-------
-     Science |     1
-     French  |     1
-     Science |     1
-     English |     1
-     Math    |     1
-     Math    |     1
-     French  |     1
-     Science |     1
-     History |     1
-     Math    |     1
-     History |     1
-     Spanish |     1
-     Spanish |     1
-    (13 rows)
+   name | num_students 
+  ------+--------------
+   Math |            3
+  (1 row)
 
 
+    /*
+    SHOWING WORK:
+    SELECT classes.name, COUNT(*) AS num_students
+    FROM classes
+    JOIN grades ON classes.ID = grades.classes_ID
+    JOIN students ON grades.students_ID = students.ID
+    GROUP BY classes.name
+    ORDER BY num_students DESC;
 
-
-
-
-
-
-
-
-
+        name   | num_students 
+      ---------+--------------
+       Math    |            3
+       Science |            3
+       History |            2
+       Spanish |            2
+       French  |            2
+       English |            1
+      (6 rows)
+      */
