@@ -55,14 +55,14 @@ QUESTION 1:
   JOIN booking ON guest.guest_ID = booking.guest_ID
   GROUP BY guest.first_name;
 
-     first_name | count 
-    ------------+-------
-     Kelly      |     2
-     Bert       |     1
-     Annie      |     1
-     Sarah      |     0
-     Carl       |     4
-    (5 rows)
+   first_name | count 
+  ------------+-------
+   Carl       |    16
+   Annie      |     4
+   Kelly      |     8
+   Sarah      |     0
+   Bert       |     4
+  (5 rows)
 
 -------------------
 QUESTION 2:
