@@ -1,0 +1,120 @@
+--------------------------
+1. In your own words, explain the benefits of normalization. Include a real-world scenario where normalization is necessary.
+--------------------------
+Normalization allows for the lack of redundancy and imporoves the integrity of the data within tables.
+Example of this would to have separate columns (attributes) for an address. Instead of all the information for an address crammed into one column, using the design of normalization we can separate the attributes and place one attribute per column. For example, "address" vs. "street", "apt #", "county", "zip code" and "state". This would also improve the integrity of the code because we would be able to locate a single apartment number in a sea of addresses, and this would be done efficiently, since the data would be contained in its own column.
+
+--------------------------
+2. List and explain the different normal forms and how they relate to one another, with regard to your real-world scenario in the first question.
+--------------------------
+There are 4 different normal forms: 1NF, 2NF, 3NF, BCNF. The normal forms relate to one another because they almost piffy-back on to the next form. For example, the heirachy of the form rules, is the rule from the previous form, plus its own additional (more strict) rule(s).
+
+    --------------------------
+    1NF
+    --------------------------
+    : 1NF - is to have one piece of data in each column, each row. This should be easy to located because data would otherwise be separated by commas. For example, not like this:
+
+    "street_address"
+    "216 Cherry Hill Rd, 45 Light St, 12 Comet Blvd, 12 Redwood St"
+
+    For that table to comply with 1NF, each street, (that was separated by a comma), would now need to be separated, and treated as "new" data - each placed in a new row within that column. Like this:
+
+    "street_address"
+    "216 Cherry Hill Rd"
+    "45 Light St"
+    "12 Comet Blvd"
+    "12 Redwood St"
+
+    --------------------------
+    2NF
+    --------------------------
+    : 2NF - The table must be in 1NF, plus, non-key attributes cannot be independent on a subset of the primary key. For example, columns titled:
+
+    "name"  "house_build"  "cash"
+
+    When a realtor is looking for a home for an individual, 'name' would relate to 'house_build' since the buyer has a preference of which house they'd like to purchase. This helps the realtor to include which type of houses to include, in the search for a new home. At no circumstance would the realtor relate 'house_build' with 'cash' because those two (non-keys) are missing the primary-key 'name'.
+
+    To comply with 2NF, this table with three columns (1:3), should be separated into two tables, with two columns each (2:2). Each of the two tables would have a primary key -> non-key, for example,:
+
+     "name" -> "house_build"
+     "name" -> "cash"
+
+    --------------------------
+    3NF
+    --------------------------
+    : 3NF - The table must be in 2NF, plus, all transitive functional depedencies of non-prime attributes must not exist, meaning you cannot have transitive relationships between non-prime attributes aka a non-key can not have a transitive depdendency with another non-key, unless broken into a separate table! A table with column titles:
+
+    "name"  "co_signer"  "cash"  "age"  "community"
+
+    "Community" is depdendent on "Age" because when the indivudal is looking for a 55+ age community, (having age restrictions), these two (non-keys) have a (transitive depdendency) relationship. To comply with 3NF, the table will be broken into two tables:
+
+    "name" -> "co_signer" -> "cash" -> "age"
+    "name" -> "age" -> "community"
+
+    (Table 1) 'co_signer', 'cash', and 'age' all are non-keys that have a transitive depdendency on the primary-key 'name'. (Table 2) The primary-key remains, however since 'community' (non-key), has a transitive depdendency on 'age' (non-key), 'community' was removed from table 1 and became a separate table altogether with the other non-key (which it has its transitive dependency on), and the primary-key.
+
+    --------------------------
+    BCNF
+    --------------------------
+    : BCNF (Boyce Codd normal form), is an advanced version of 3NF, plus, every dependency must be a super key of the table. (*A super key is a set of attributes within a table whose values can be used to uniquely identify all other attributes.*)
+
+    "name"  "co_signer"  "cash"  "age"  "community"
+
+    becomes:
+
+    "name" -> "co_signer" -> "cash"
+    "age" -> "community"
+
+    To comply with BCNF, the non-key transitive dependency has been separated from the original table (complies with 3NF), and instead of creating a new table using the primary key (as the super key), within the second table, the non-key (which has a transitive dependency with the other non-key) is now magically made the super key! Notice how the second table is made with just the candidate keys, however this time one of them was made into a super key!!
+
+--------------------------
+3. This student_records table contains students and their grades in different subjects. The schema is already in first normal form (1NF). Convert this schema to the third normal form (3NF) using the techniques you learned in this checkpoint.
+--------------------------
+
+    --------------------------
+    BEFORE (in 1NF)
+    --------------------------
+    "id"  "student_id"  "student_email"  "student_name"  "professor_id"  "professor_name"  "subject"  "grade"
+
+    --------------------------
+    AFTER (using 3NF)
+    --------------------------
+    "id" -> "student_id" -> "professor_id" -> "subject"
+    "student_id" -> "student_email" -> "student_name"
+    "professor_id" -> "professor_name"
+    "subject" -> "grade"
+
+--------------------------
+4. In your own words, explain the potential disadvantages of normalizing the data above. What are its trade-offs? Submit your findings in the submission table and discuss them with your mentor in your next session.
+--------------------------
+
+  Although normalizing reduces redundancy in code and improves the integrity of the data, there are still potential negative factors. The trade-offs to normalization would be creating more tables, increasing the performance time, and also increasing the amount of joins to make relationships across the tables. Not to mention, a normalized database is difficult and expensive to design.
+
+
+--------------------------
+5. Looking at the tables you have normalized. If you need to denormalize to improve query performance or speed up reporting, how would you carry out denormalization for this database design? Submit potential strategies in the submission tab and discuss them with your mentor in your next session.
+--------------------------
+
+  Advantages to denormalization: (1) to enhance query performance (a normalized database requires joining a lot of tables to fetch queries, the more joins, the slower the query,) (2) to make a databse more convenient to manage (denormalized databases have calculated values that are essential for applications, once they're generated and added to tables, downstream programmers can easily create their own reports and queries without having in-depth knowledge of the app's code or API), (3) to facilitate and accelerate reporting (denormalizing your database can meet the challenge of running a live report without negatively impacting overall system performance. For example, normalized database would aggregate and calculate all invoice details multiple times, this is time-consuming! To speed up the process, using a denormalized database, you could instead maintain the year-to-date sales summary in a table storying user details.)
+
+  student    id               professor       subject
+  id         student_id       id              id
+  name       professor_id     subject_id      grade
+  email                       name
+
+  *student_id and professor_id are joined by id. The id's do not have to match they just need to make a relationship between the tables in order to retreive information, once the condition is met. The foreign-key subject_id is stored in professor in order to make a connection between those two tables. We would not want to store 'subject' as a field under 'profressor' because we need to keep the data for 'grade' separated to easily access at a later time.
+
+--------------------------
+6. Explore the trade-offs between data normalization and denormalization in this scenario, submit your findings in the submission tab, and discuss them with your mentor in your next session.
+
+
+  Already mentioned above for each ^
+
+  #4. ..."normalizing reduces redundancy in code and improves the integrity of the data."
+  #5. "Advantages to denormalization: (1) to enhance query performance (a normalized database requires joining a lot of tables to fetch queries, the more joins, the slower the query,) (2) to make a databse more convenient to manage (denormalized databases have calculated values that are essential for applications, once they're generated and added to tables, downstream programmers can easily create their own reports and queries without having in-depth knowledge of the app's code or API), (3) to facilitate and accelerate reporting (denormalizing your database can meet the challenge of running a live report without negatively impacting overall system performance. For example, normalized database would aggregate and calculate all invoice details multiple times, this is time-consuming! To speed up the process, using a denormalized database, you could instead maintain the year-to-date sales summary in a table storying user details.)"
+
+
+
+
+
+--------------------------
