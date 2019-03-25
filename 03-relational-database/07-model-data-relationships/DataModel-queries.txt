@@ -50,19 +50,18 @@ QUESTION 1:
 
 + The number of unique guests who have booked the same room.
 
-  SELECT DISTINCT(guest.first_name), COUNT(booking.room_id)
+  SELECT room.room_number, COUNT(*) AS times_room_used
   FROM guest
   JOIN booking ON guest.guest_ID = booking.guest_ID
-  GROUP BY guest.first_name;
+  JOIN room ON booking.room_ID = room.room_ID
+  GROUP BY booking.room_id, room.room_number;
 
-   first_name | count 
-  ------------+-------
-   Carl       |    16
-   Annie      |     4
-   Kelly      |     8
-   Sarah      |     0
-   Bert       |     4
-  (5 rows)
+     room_number | times_room_used 
+    -------------+-----------------
+               9 |               4
+              12 |               2
+               1 |               2
+    (3 rows)
 
 -------------------
 QUESTION 2:
@@ -93,21 +92,26 @@ QUESTION 3:
 
 + The number of each grade (using letter grades A-F) earned in a particular class.
 
-  SELECT DISTINCT(classes.name), COUNT(grades.letter_grade)
+  SELECT classes.name, grades.letter_grade, COUNT(*)
   FROM grades
   JOIN classes ON grades.classes_ID = classes.ID
-  GROUP BY classes.name
-  ORDER BY classes.name ASC;
+  GROUP BY grades.letter_grade, classes.name
+  ORDER BY classes.name;
 
-      name   | count 
-    ---------+-------
-     English |     1
-     French  |     2
-     History |     2
-     Math    |     3
-     Science |     3
-     Spanish |     2
-    (6 rows)
+      name   | letter_grade | count 
+    ---------+--------------+-------
+     English | B            |     1
+     French  | B            |     2
+     History | A            |     1
+     History | B            |     1
+     Math    | A            |     1
+     Math    | E            |     1
+     Math    | F            |     1
+     Science | A            |     1
+     Science | B            |     2
+     Spanish | C            |     1
+     Spanish | D            |     1
+    (11 rows)
 
 
 + Class names and the total number of students who have taken each class in the list.
