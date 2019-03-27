@@ -1,0 +1,509 @@
+----------------------
+1. Explain a subquery in your own words.
+----------------------
+
+  A subquery can be used when you're trying to gather information from multiple tables. A subquery is a SQL query nested inside of a larger query. The nested query can be located within the SELECT, WHERE or FROM clause. Also, for better performance you should have an independent subquery, this means the query could be taken out and it will run by itself. Running a depdendent subquery could cause performance issues because a dependent subquery typically needs to be run once for each row in the outer query. For example, if the outer query has 2,000 rows, the subquery will be run 2,000 times! In contrast to the dependent subquery, the independent subquery typically needs to be ran once.
+
+
+----------------------
+2. Where can you use a subquery within a SELECT statement?
+----------------------
+
+  SELECT, WHERE or FROM 
+
+
+----------------------
+3. When would you employ a subquery?
+----------------------
+
+  A subquery can be used in a SELECT, INSERT, DELETE, or UPDATE statement to perform the following tasks:
+    + compare an expression to the result of the query
+    + determine if an expression is included in the results of the query
+    + check whether the query selects any rows
+
+
+----------------------
+4. Explain a row constructor in your own words.
+----------------------
+
+  A row constructor creates an instance of an Object in any Object Oriented Programming language; it can create an entire row (or rows) set by using the VALUES() clause. This allows multiple rows of data to be specified in a single DML (data manipulation language) statement. So its an expression that builds a single row (or rows) using values for its "member fields"; it's also useful when matching values in multiple columns in a subquery. Also, fun fact, a row constructor doesn't need to require a full table row: it does not need to match the number of columns returned from a subquery. 
+
+
+----------------------
+5. What happens if a row in the subquery result provides a NULL value to the comparison?
+----------------------
+
+  If there are no failuers in a comparison, but at least one right-hand row yields NULL for the operator's result, the result of the comparison will be NULL, not true.
+
+
+----------------------
+6. What are the ways to use a subquery within a WHERE clause?
+----------------------
+
+  Subquery, row constructor, EXISTS, IN, NOT IN, ALL, ANY, SOME, & NOT EXISTS
+
+
+----------------------
+7. Using this Adoption schema and data, please write queries to retrieve the following information and include the results:
+
+
+  ----------------------
+  All volunteers. If the volunteer is fostering a dog, include each dog as well.
+  ----------------------
+
+      -----------------------
+      previous answer ... no subqueries
+      ------------------------
+        SELECT volunteers.first_name, volunteers.available_to_foster, dogs.name
+        FROM volunteers
+        LEFT OUTER JOIN dogs
+        ON volunteers.foster_dog_id = dogs.id;
+      ------------------------
+
+      ------------------------
+      ANSWER:
+      ------------------------
+      SELECT volunteers.first_name, volunteers.available_to_foster, (
+        SELECT dogs.name 
+        FROM dogs
+        WHERE volunteers.foster_dog_id = dogs.id
+      )
+      FROM volunteers;
+
+      RESULT:
+      | first_name | available_to_foster | name       |
+      | ---------- | --------------------| ---------  |
+      | Rubeus     | true                | Munchkin   |
+      | Marjorie   | true                | Marmaduke  |
+      | Sirius     | true                | null       |
+      | Remus      | true                | null       |
+      | Albus      | false               | null       |
+
+
+  ----------------------
+  The cat's name, adopter's name, and adopted date for each cat adopted within the past month to be displayed as part of the "Happy Tail" social media promotion which posts recent successful adoptions.
+  ----------------------
+
+      -----------------------
+      previous answer ... no subqueries
+      ------------------------
+      SELECT c.name AS cats_name, a.first_name AS human_first_name, a.last_name AS human_last_name, ca.date
+      FROM cat_adoptions AS ca
+      JOIN cats AS c
+      ON ca.cat_id = c.id
+      JOIN adopters AS a
+      ON a.id = ca.adopter_id
+      WHERE ca.date > CURRENT_DATE - INTERVAL '30 DAYS';
+      ------------------------
+
+      ------------------------
+      ANSWER:
+      ------------------------
+      SELECT t.first_name, t.last_name, t.name, t.date
+      FROM (
+        SELECT c.name,
+        a.first_name,
+        a.last_name,
+        ca.date
+        FROM cat_adoptions AS ca
+        JOIN cats AS c
+        ON ca.cat_id = c.id
+        JOIN adopters AS a
+        ON a.id = ca.adopter_id) t
+      WHERE t.date > CURRENT_DATE - INTERVAL '30 DAYS';
+
+      RESULT:
+      | first_name| last_name | name     |  date
+      | --------- | --------- | -------- | --------------------------
+      | Arabella  | Figg      | Mushi    |  2019-03-05T00:00:00.000Z
+      | Argus     | Filch     | Victoire |  2019-03-10T00:00:00.000Z
+
+
+  ----------------------
+  Adopters who have not yet chosen a dog to adopt and generate all possible combinations of adopters and available dogs.
+  ----------------------
+
+      -----------------------
+      previous answer ... no subqueries
+      ------------------------
+      SELECT a.first_name AS adpoters_name, d.name AS dogs_name
+      FROM dogs AS d
+      CROSS JOIN adopters AS a;
+      ------------------------
+
+      ------------------------
+      ANSWER:
+      ------------------------
+      SELECT t.name, t.first_name
+      FROM (
+        SELECT * FROM dogs
+        CROSS JOIN adopters
+      ) t;
+
+      RESULT:
+      | first_name | name      |
+      | ---------- | --------- |
+      | Hermione   | Boujee    |
+      | Arabella   | Boujee    |
+      | Argus      | Boujee    |
+      | Hermione   | Munchkin  |
+      | Arabella   | Munchkin  |
+      | Argus      | Munchkin  |
+      | Hermione   | Marley    |
+      | Arabella   | Marley    |
+      | Argus      | Marley    |
+      | Hermione   | Lassie    |
+      | Arabella   | Lassie    |
+      | Argus      | Lassie    |
+      | Hermione   | Marmaduke |
+      | Arabella   | Marmaduke |
+      | Argus      | Marmaduke |
+      | Hermione   | Rosco     |
+      | Arabella   | Rosco     |
+      | Argus      | Rosco     |
+
+
+  ----------------------
+  Lists of all cats and all dogs who have not been adopted.
+  ----------------------
+
+      -----------------------
+      previous answer ... no subqueries
+      ------------------------
+      SELECT dogs.name AS Dogs_Name,
+      cats.name AS Cats_Name
+      FROM dogs
+      LEFT JOIN dog_adoptions ON dogs.id =  dog_adoptions.dog_id
+      FULL JOIN adopters ON dog_adoptions.adopter_ID = adopters.id
+      FULL JOIN cat_adoptions ON adopters.id = cat_adoptions.adopter_id
+      FULL JOIN cats ON cat_adoptions.cat_id = cats.id
+      WHERE dog_adoptions.dog_id IS NULL AND cats.adoption_date IS NULL;
+      ------------------------
+
+      ------------------------
+      ANSWER:
+      ------------------------
+      Query 1:
+      SELECT d.name AS "Dogs Name"
+      FROM dog_adoptions AS da
+      JOIN (
+          SELECT name, id FROM dogs
+      ) AS d
+      ON d.id != da.dog_id;
+
+      RESULT:
+      | Dogs Name |
+      | --------- |
+      | Boujee    |
+      | Munchkin  |
+      | Marley    |
+      | Lassie    |
+      | Marmaduke |
+
+      Query 2:
+      SELECT  DISTINCT c.name AS "Cats Name"
+      FROM cat_adoptions AS ca
+      JOIN (
+            SELECT name, id FROM cats
+      ) AS c
+      ON c.id != ca.cat_id;
+
+      RESULT:
+      | Cats Name |
+      | --------- |
+      | Azul      |
+      | Seashell  |
+      | Nala      |
+      | Mushi     |
+      | Victoire  |
+
+  ----------------------
+  The name of the person who adopted Rosco.
+  ----------------------
+
+      -----------------------
+      previous answer ... no subqueries
+      ------------------------
+      SELECT adopters.first_name AS adopters_Name, dogs.name AS Dogs_Name
+      FROM dogs
+      JOIN dog_adoptions ON dogs.id = dog_adoptions.dog_id
+      JOIN adopters ON dog_adoptions.adopter_id = adopters.id
+      WHERE dogs.name = 'Rosco';
+      ------------------------
+
+      ------------------------
+      ANSWER:
+      ------------------------
+      SELECT
+        (SELECT first_name FROM adopters AS a WHERE da.adopter_id = a.id) AS "First Name",
+        (SELECT last_name FROM adopters AS a WHERE da.adopter_id = a.id) AS "Last Name",
+        (SELECT name FROM dogs AS d WHERE d.id = da.dog_ID) AS "Dogs Name"
+      FROM dog_adoptions as da;
+
+      RESULT:
+      | First Name | Last Name | Dogs Name |
+      | ---------- | --------- | --------- |
+      | Argus      | Filch     | Rosco     |
+
+----------------------
+8. Using this Library schema and data, write queries applying the following scenarios, and include the results:
+
+  ----------------------
+  To determine if the library should buy more copies of a given book, please provide the names and position, in order, of all of the patrons with a hold (request for a book with all copies checked out) on "Advanced Potion-Making".
+  ----------------------
+
+      -----------------------
+      previous answer ... no subqueries
+      ------------------------
+      SELECT books.title, holds.rank, patrons.name
+      FROM books
+      JOIN holds ON books.isbn = holds.isbn
+      JOIN patrons ON holds.patron_id = patrons.id
+      WHERE title = 'Advanced Potion-Making'
+      ORDER BY holds.rank;
+      ------------------------
+
+      ------------------------
+      ANSWER:
+      ------------------------
+      SELECT
+        (SELECT title FROM books AS b WHERE b.isbn = h.isbn) AS "Book Title",
+        (SELECT name FROM patrons AS p WHERE h.patron_id = p.id) AS "Patron", h.rank
+      FROM holds AS h
+      WHERE h.isbn = '9136884926'
+      ORDER BY rank;
+
+      RESULT:
+      | Book Title             | Patron         | rank |
+      | ---------------------- | -------------- | ---- |
+      | Advanced Potion-Making | Terry Boot     | 1    |
+      | Advanced Potion-Making | Cedric Diggory | 2    |
+
+
+  ----------------------
+  Make a list of all book titles and denote whether or not a copy of that book is checked out.
+  ----------------------
+
+      -----------------------
+      previous answer ... no subqueries
+      ------------------------
+      SELECT books.title, transactions.checked_out_date, transactions.checked_in_date
+      FROM books
+      RIGHT JOIN transactions ON books.isbn = transactions.isbn
+      WHERE transactions.checked_in_date IS NULL;
+      ------------------------
+
+      ------------------------
+      ANSWER:
+      ------------------------
+      SELECT
+        (SELECT title FROM books AS b WHERE b.isbn = t.isbn) AS "Book Title",
+        t.checked_out_date AS "Checked Out",
+        t.checked_in_date AS "Checked In"
+      FROM transactions AS t
+      ORDER BY t.checked_in_date;
+
+      RESULT:
+      | Book Title                              | Checked Out               | Checked In               |
+      | --------------------------------------- | ------------------------- | ------------------------ |
+      | Hogwarts: A History                     | 2013-03-25T00:00:00.000Z  | 2013-03-26T00:00:00.000Z |
+      | Advanced Potion-Making                  | 2013-03-25T00:00:00.000Z  | 2013-03-26T00:00:00.000Z |
+      | Fantastic Beasts and Where to Find Them | 2013-03-25T00:00:00.000Z  | 2013-03-26T00:00:00.000Z |
+      | Fantastic Beasts and Where to Find Them | 2019-03-19T00:00:00.000Z  | 2019-03-22T00:00:00.000Z |
+      | Fantastic Beasts and Where to Find Them | 2019-03-23T00:00:00.000Z  | 2019-03-25T00:00:00.000Z |
+      | Advanced Potion-Making                  | 2019-03-23T00:00:00.000Z  | null                     |
+      | Fantastic Beasts and Where to Find Them | 2019-03-25T00:00:00.000Z  | null                     |
+
+  ----------------------
+  In an effort to learn which books take longer to read, the librarians would like you to create a list of average checked out time by book name in the past month.
+  ----------------------
+
+      -----------------------
+      previous answer ... no subqueries
+      ------------------------
+      SELECT books.title, AVG(transactions.checked_in_date - transactions.checked_out_date) 
+      FROM books
+      JOIN transactions ON books.isbn = transactions.isbn
+      WHERE transactions.checked_out_date < CURRENT_DATE - INTERVAL '30 DAYS' AND transactions.checked_in_date IS NOT NULL
+      GROUP BY books.title;
+      ------------------------
+
+      ------------------------
+      ANSWER:
+      -----------------------
+      SELECT AVG(t.checked_in_date - t.checked_out_date) as "Average Time Book is Checked Out", 
+        (SELECT title FROM books AS b WHERE b.isbn = t.isbn) AS "Book Title"
+      FROM transactions AS t
+      WHERE t.checked_out_date < CURRENT_DATE - INTERVAL '30 DAYS'
+      GROUP BY t.isbn;
+
+      RESULT:
+      | Average Time Book is Checked Out | Book Title                              |
+      | -------------------------------- | --------------------------------------- |
+      | 1.00000000000000000000           | Hogwarts: A History                     |
+      | 1.00000000000000000000           | Advanced Potion-Making                  |
+      | 1.00000000000000000000           | Fantastic Beasts and Where to Find Them |
+
+  ----------------------
+  In order to learn which items should be retired, make a list of all books that have not been checked out in the past 5 years.
+  ----------------------
+
+      -----------------------
+      previous answer ... no subqueries
+      ------------------------
+      SELECT books.title,
+      transactions.checked_out_date
+      FROM books
+      LEFT OUTER JOIN transactions
+      ON transactions.isbn = books.isbn
+      GROUP BY books.title, books.isbn, transactions.checked_out_date
+      HAVING transactions.checked_out_date < CURRENT_DATE - INTERVAL '5 YEARS';
+      ------------------------
+
+      ------------------------
+      ANSWER:
+      -----------------------
+      SELECT
+        (SELECT title FROM books AS b WHERE t.isbn = b.isbn) AS "Book Title",
+          t.checked_out_date
+      FROM transactions AS t
+      WHERE t.checked_out_date < CURRENT_DATE - INTERVAL '5 YEARS'
+      ORDER BY "Book Title";
+
+      RESULT:
+      | Book Title                                | checked_out_date         |
+      | ----------------------------------------- | ------------------------ |
+      | Advanced Potion-Making                    | 2013-03-25T00:00:00.000Z |
+      | Fantastic Beasts and Where to Find Them   | 2013-03-25T00:00:00.000Z |
+      | Hogwarts: A History                       | 2013-03-25T00:00:00.000Z |
+
+  ----------------------
+  List all of the library patrons. If they have one or more books checked out, correspond the books to the patrons.
+  ----------------------
+
+      -----------------------
+      previous answer ... no subqueries
+      ------------------------
+      SELECT p.id, p.name, t.isbn, b.title, t.checked_out_date, t.checked_in_date
+      FROM patrons AS p
+      RIGHT OUTER JOIN transactions AS t 
+      ON p.id = t.patron_id
+      RIGHT OUTER JOIN books AS b 
+      ON b.isbn = t.isbn
+      ORDER BY p.id;
+      ------------------------
+
+      ------------------------
+      ANSWER:
+      -----------------------
+      SELECT
+        (SELECT name FROM patrons AS p WHERE t.patron_id = p.id) AS "Reader's Name",
+        (SELECT title FROM books AS b WHERE t.isbn = b.isbn) AS "Book Title",
+          t.isbn, t.checked_out_date, t.checked_in_date
+      FROM transactions AS t
+      ORDER BY "Reader's Name";
+
+      RESULT:
+      | Reader's Name    | Book Title                              | isbn       | checked_out_date         | checked_in_date          |
+      | ---------------- | --------------------------------------- | ---------- | ------------------------ | ------------------------ |
+      | Cedric Diggory   | Fantastic Beasts and Where to Find Them | 3458400871 | 2019-03-25T00:00:00.000Z | null                     |
+      | Cho Chang        | Advanced Potion-Making                  | 9136884926 | 2013-03-25T00:00:00.000Z | 2013-03-26T00:00:00.000Z |
+      | Hermione Granger | Fantastic Beasts and Where to Find Them | 3458400871 | 2019-03-23T00:00:00.000Z | 2019-03-25T00:00:00.000Z |
+      | Hermione Granger | Hogwarts: A History                     | 1840918626 | 2013-03-25T00:00:00.000Z | 2013-03-26T00:00:00.000Z |
+      | Padma Patil      | Fantastic Beasts and Where to Find Them | 3458400871 | 2019-03-19T00:00:00.000Z | 2019-03-22T00:00:00.000Z |
+      | Terry Boot       | Advanced Potion-Making                  | 9136884926 | 2019-03-23T00:00:00.000Z | null                     |
+      | Terry Boot       | Fantastic Beasts and Where to Find Them | 3458400871 | 2013-03-25T00:00:00.000Z | 2013-03-26T00:00:00.000Z |
+
+----------------------
+9. Using this Flight schema and data, write queries applying the following scenarios, and include the results:
+
+
+  ----------------------
+  To determine the most profitable airplanes, find all airplane models where each flight has had over 250 paying customers in the past month.
+  ----------------------
+
+    ------------------------
+    ANSWER:
+    -----------------------
+    SELECT
+      (SELECT airplane_model FROM flights AS f WHERE f.flight_number = t.flight_number ) AS "Airplane Model",
+      t.seats_sold AS "Seats Sold"
+    FROM transactions AS t
+    WHERE t.seats_sold > 250
+    ORDER BY "Airplane Model";
+
+    RESULT:
+    | Airplane Model | Seats Sold |
+    | -------------- | ---------- |
+    | Airbus A330    | 287        |
+    | Airbus A350    | 310        |
+    | Airbus A380    | 490        |
+    | Boeing 777     | 380        |
+    | Boeing 787     | 280        |
+
+  ----------------------
+  To determine the most profitable flights, find all destination-origin pairs where 90% or more of the seats have been sold in the past month.
+  ----------------------
+
+    ------------------------
+    ANSWER:
+    -----------------------
+    SELECT s.seats_sold, s.seat_capacity, s.origin, s.destination
+    FROM (
+      SELECT seat_capacity, origin, destination, seats_sold
+      FROM flights AS f
+      JOIN airplanes AS a 
+      ON f.airplane_model = a.model
+      JOIN transactions AS t
+      ON f.flight_number = t.flight_number) s
+    WHERE ((s.seats_sold * 1.0)/ s.seat_capacity) >= .9;
+
+    RESULT:
+    |seats_sold | seat_capacity |origin | destination |
+    | --------- | ------------- | ----- | ----------- |
+    |287        | 287           | LHR   |    JFK      |
+    |380        | 400           | SFO   |    HKG      |
+    |490        | 544           | LHR   |    JNB      |
+
+  ----------------------
+  The airline is looking to expand its presence in Asia and globally. Find the total revenue of any flight (not time restricted) arriving at or departing from Singapore (SIN).
+  ----------------------
+
+    ------------------------
+    ANSWER:
+    -----------------------
+    /*
+    Working on Answer:
+    SELECT f.flight_number AS "Flight Number", f.origin, f.destination, t.total_revenue AS "Total Revenue"
+    FROM transactions AS t
+    JOIN flights AS f
+    ON t.flight_number = f.flight_number
+    WHERE destination = 'SIN' OR origin = 'SIN';
+
+    RESULT:
+    | Flight Number | origin | destination | Total Revenue |
+    | ------------- | ------ | ----------- | ------------- |
+    | 7352          | SIN    | MAN         | 250394.7000   |
+    | 7403          | MEL    | SIN         | 131992.1200   |
+    */
+
+    SELECT SUM(result.total_revenue) AS "Total Revenue of Flights Traveling To or From Singapore"
+    FROM flights AS f
+    JOIN
+        (SELECT t.total_revenue, t.flight_number
+         FROM transactions AS t
+         JOIN flights AS f
+         ON t.flight_number = f.flight_number
+         WHERE f.destination = 'SIN' OR f.origin = 'SIN') AS result
+    ON f.flight_number = result.flight_number;
+
+    RESULT:
+    | Total Revenue of Flights Traveling To or From Singapore |
+    | ------------------------------------------------------- |
+    | 382386.8200                                             |
+
+
+----------------------
+10. Compare the subqueries you've written above. Compare them to the joins you wrote in Checkpoint 6. Which ones are more readable? Which were more logical to write?
+----------------------
+  I spoke with my mentor on this exact question and the overall feel of the conversation was to use subqueries sparingly. You'd have to imagine that one would be writing queries for a much larger database, and not just a test on a single file (more like our class assignment). Subqueries will overall take more time to execute because it will run all the queries and load all their data to do the processing, versus using a join query in which RDBMS can predict what data should be loaded to be processed and save time.
