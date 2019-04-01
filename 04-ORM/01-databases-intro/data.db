@@ -1,0 +1,200 @@
+Last login: Wed Mar 27 08:12:40 on ttys000
+lcaton-mbp:~ lcaton$ sqlite3 -version
+3.24.0 2018-06-04 14:10:15 95fbac39baaab1c3a84fdfc82ccb7f42398b2e92f18a2a57bce1d4a713cbaapl
+lcaton-mbp:~ lcaton$ sqlite3
+SQLite version 3.24.0 2018-06-04 14:10:15
+Enter ".help" for usage hints.
+Connected to a transient in-memory database.
+Use ".open FILENAME" to reopen on a persistent database.
+
+sqlite> CREATE TABLE post(
+   ...> id INTEGER PRIMARY KEY,
+   ...> title TEXT,
+   ...> body TEXT
+   ...> );
+
+sqlite> .schema post
+
+CREATE TABLE post(
+id INTEGER PRIMARY KEY,
+title TEXT,
+body TEXT
+);
+sqlite> SELECT * FROM post;
+1|Deep in the Heart of Texas|The stars at night are big and bright, Deep in the heart of Texas, The prairie sky is wide and high, Deep in the heart of Texas.
+2|Follow the Drinkin' Gourd|When the sun goes down
+And the first quail call
+Follow the drinkin' gourd
+Then it's time, children
+to come one and all and
+Follow the drinkin' gourd
+sqlite> .headers on
+sqlite> .mode column
+sqlite> SELECT * FROM post;
+id   title                       body                                                                                 
+--- --------------------------  --------------------------------------------------------------------------------------
+1   Deep in the Heart of Texas  The stars at night are big and bright, Deep in the heart of Texas, The prairie sky is wide and high, Deep in the heart of Texas.
+2   Follow the Drinkin' Gourd   When the sun goes down
+And the first quail call
+Follow the drinkin' gourd
+Then it's time, children
+to come one and all and
+Foll
+sqlite> PRAGMA foreign_keys = ON;
+sqlite> CREATE TABLE comment(
+   ...> id INTEGER PRIMARY KEY,
+   ...> body TEXT,
+   ...> post_id INTEGER NOT NULL,
+   ...> FOREIGN KEY(post_id) REFERENCES post(id)
+   ...> );
+
+sqlite>  INSERT INTO comment (body) VALUES ('Follow the Drinking Gourd was published in 1928.');
+Error: NOT NULL constraint failed: comment.post_id
+sqlite> Error: NOT NULL constraint failed: comment.post_idINSERT INTO comment (body, post_id) VALUES ('Follow the Drinking Gourd was published in 1928.', 123);
+Error: near "Error": syntax error
+sqlite> INSERT INTO comment (body, post_id) VALUES ('Follow the Drinking Gourd was published in 1928.', 123);
+Error: FOREIGN KEY constraint failed
+sqlite> INSERT INTO comment (body, post_id) VALUES ('Follow the Drinking Gourd was published in 1928.', 2);
+sqlite> INSERT INTO comment (body, post_id) VALUES ('The Underground Railroad used the Drinking Gourd song to secretly communicate escape instructions and a map to slaves.', 2);
+sqlite> SELECT * FROM comment WHERE post_id = 2;
+id          body                                              post_id   
+----------  ------------------------------------------------  ----------
+1           Follow the Drinking Gourd was published in 1928.  2         
+2           The Underground Railroad used the Drinking Gourd  2         
+sqlite> SELECT * POSTS;
+Error: near "POSTS": syntax error
+sqlite> SELECT * POST;
+Error: near "POST": syntax error
+sqlite> SELECT * FROM post;
+id   title                       body                                                                                 
+--- --------------------------  --------------------------------------------------------------------------------------
+1   Deep in the Heart of Texas  The stars at night are big and bright, Deep in the heart of Texas, The prairie sky is wide and high, Deep in the heart of Texas.
+2   Follow the Drinkin' Gourd   When the sun goes down
+And the first quail call
+Follow the drinkin' gourd
+Then it's time, children
+to come one and all and
+Foll
+sqlite>  SELECT * FROM comment WHERE post_id = 2;
+id          body                                              post_id   
+----------  ------------------------------------------------  ----------
+1           Follow the Drinking Gourd was published in 1928.  2         
+2           The Underground Railroad used the Drinking Gourd  2         
+sqlite> SELECT * FROM COMMENT;
+id          body                                              post_id   
+----------  ------------------------------------------------  ----------
+1           Follow the Drinking Gourd was published in 1928.  2         
+2           The Underground Railroad used the Drinking Gourd  2         
+sqlite> .save data.db
+sqlite> .exit
+
+----------------------
+class assignment
+----------------------
+
+Last login: Fri Mar 29 12:39:41 on ttys003
+lcaton-mbp:~ lcaton$ sqlite3 data.db
+SQLite version 3.24.0 2018-06-04 14:10:15
+Enter ".help" for usage hints.
+sqlite> CREATE TABLE user(
+   ...> id INTEGER PRIMARY KEY,
+   ...> full_name TEXT,
+   ...> email TEXT
+   ...> );
+sqlite>  INSERT INTO user (full_name, email) VALUES ( 'Sarah Smith', 'jersey2109@hotmail.com');
+sqlite>  INSERT INTO user (full_name, email) VALUES ( 'Todd Carter', 'todd123carter@gmail.com');
+sqlite>  INSERT INTO user (full_name, email) VALUES ( 'Valerie Carrol', 'vcares@gmail.com');
+sqlite> .headers on
+sqlite> .mode column
+sqlite> SELECT * FROM user;
+id          full_name    email                 
+----------  -----------  ----------------------
+1           Sarah Smith  jersey2109@hotmail.com
+2           Todd Carter  todd123carter@gmail.co
+3           Valerie Car  vcares@gmail.com      
+sqlite>
+sqlite> SELECT * FROM post;
+id   title                       body                                                                                 
+--- --------------------------  --------------------------------------------------------------------------------------
+1   Deep in the Heart of Texas  The stars at night are big and bright, Deep in the heart of Texas, The prairie sky is wide and high, Deep in the heart of Texas.
+2   Follow the Drinkin' Gourd   When the sun goes down
+And the first quail call
+Follow the drinkin' gourd
+Then it's time, children
+to come one and all and
+Foll
+3   Follow Me                   Follow me down the yellow brick road
+4   Spring                      April showers bring May flowers!
+sqlite> INSERT INTO comment (body, post_id) VALUES ('I love this movie!', 3);
+sqlite> INSERT INTO comment (body, post_id) VALUES ('Bring on the rain!', 4);
+
+sqlite> SELECT * FROM post
+   ...> ;
+id   title                        body                                                                   user_id
+---  ---------------------------  ---------------------------------------------------------------------- ----------
+1    Deep in the Heart of Texas   The stars at night are big and bright, Deep in the heart of Texas, The prairie sky is wide and high, Deep in the heart of Texas.            
+2    Follow the Drinkin' Gourd    When the sun goes down
+And the first quail call
+Follow the drinkin' gourd
+Then it's time, children
+to come one and all and
+Foll            
+3   Follow Me                     Follow me down the yellow brick road                                   
+4   Spring                       April showers bring May flowers!                                                                                                 
+sqlite> SELECT * FROM comment;
+id          body                                              post_id     user_id   
+----------  ------------------------------------------------  ----------  ----------
+1           Follow the Drinking Gourd was published in 1928.  2                     
+2           The Underground Railroad used the Drinking Gourd  2                     
+3           I love this movie!                                3                     
+4           Bring on the rain!                                4                     
+sqlite> 
+sqlite> UPDATE post SET user_id = 3;
+sqlite> SELECT * FROM post;
+id   title                        body                                                                   user_id
+---  ---------------------------  ---------------------------------------------------------------------- ----------
+1    Deep in the Heart of Texas   The stars at night are big and bright, Deep in the heart of Texas, The prairie sky is wide and high, Deep in the heart of Texas.  3
+2    Follow the Drinkin' Gourd    When the sun goes down
+And the first quail call
+
+Follow the drinkin' gourd
+Then it's time, children
+to come one and all and
+Foll  3         
+3           Follow Me                   Follow me down the yellow brick road                               3
+4           Spring                      April showers bring May flowers!                                   3
+sqlite> UPDATE post SET user_id = 3;
+sqlite> UPDATE post SET user_id = 23 WHERE post.id = 3;
+sqlite> UPDATE post SET user_id = 12 WHERE post.id = 4;
+id   title                        body                                                                   user_id
+---  ---------------------------  ---------------------------------------------------------------------- ----------
+1    Deep in the Heart of Texas  The stars at night are big and bright, Deep in the heart of Texas, The prairie sky is wide and high, Deep in the heart of Texas.  3         
+2    Follow the Drinkin' Gourd   When the sun goes down
+And the first quail call
+
+Follow the drinkin' gourd
+Then it's time, children
+to come one and all and
+Foll  3         
+3    Follow Me                   Follow me down the yellow brick road                                     23
+4    Spring                      April showers bring May flowers!                                         12
+sqlite> SELECT * FROM comment;
+id          body                                              post_id     user_id   
+----------  ------------------------------------------------  ----------  ----------
+1           Follow the Drinking Gourd was published in 1928.  2                     
+2           The Underground Railroad used the Drinking Gourd  2                     
+3           I love this movie!                                3                     
+4           Bring on the rain!                                4                     
+sqlite> UPDATE TABLE comment SET user_id = 12 WHERE comment.id = 2 AND comment.id = 4;
+Error: near "TABLE": syntax error
+sqlite> UPDATE comment SET user_id = 1 WHERE comment.id = 1;
+sqlite> UPDATE comment SET user_id = 12 WHERE comment.id = 2 OR comment.id = 4;
+sqlite> UPDATE comment SET user_id = 3 WHERE comment.id = 3;
+sqlite> SELECT * FROM comment;
+id          body                                              post_id     user_id   
+----------  ------------------------------------------------  ----------  ----------
+1           Follow the Drinking Gourd was published in 1928.  2           1         
+2           The Underground Railroad used the Drinking Gourd  2           12        
+3           I love this movie!                                3           3         
+4           Bring on the rain!                                4           12        
+sqlite> 

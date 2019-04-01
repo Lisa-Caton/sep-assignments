@@ -1,0 +1,232 @@
+Exercise:
+For each below write pseudo-code & also write a corresponding SQL statement.
+
+-------------
+1. remove duplicates in a query response
+-------------
+
+  You would use the DISTINCT clause.
+  SELECT DISTINCT column_name FROM table;
+
+-------------
+2. filter records using inequalities, pattern matching, ranges, and boolean logic
+-------------
+    --------------------------
+    Equality:
+    --------------------------
+    An equality condition test that a column or expression matches a value.
+    In order for a row to be return the following expression must be true:
+
+    pseudo-code: Find the row in the data where it equals 'MD' and return if true.
+    code:        WHERE State = 'MD'
+
+    --------------------------
+    Pattern matching:
+    --------------------------
+    IF your data was inconsistent and states in the database were in various capitalization combinations
+    like 'md', 'Md', and 'mD' which are all different values as far as an equality is concerned, you could
+    compare the uppercase version to be safe. That way regardless, of however your state was capitalized,
+    it would always evaluate to all caps and then safely compared to the proper abbreviation of the state.
+
+    pseudo-code: Take every state and capialize it before finding it, return if true.
+    code:        Upper(State) = 'MD'
+
+    --------------------------
+    Inequality:
+    --------------------------
+    Sometimes you need to exclude a value. To do this you can use equality.
+
+    pseudo-code: Return all states that are not 'MD'
+    code:        State <> 'MD'
+
+    --------------------------
+    Ranges:
+    --------------------------
+    The ranges conditions we are most interested in are Greater Than, Less Than, and Between.
+
+    pseudo-code: Is the quantity more than 10?
+    code:        Quantity > 10
+
+    *The range conditions works on text just as well as numbers.
+
+    pseudo-code: Return all state abbreviations after Marylands's.
+    code:        State >= 'MD'
+
+    pseudo-code: Find all customers within states less than or equal to 'MD'.
+    code:        SELECT CompanyName, ContactName
+                 FROM Customers
+                 WHERE State <= 'MD';
+
+    pseudo-code: Show TotalPrices to fall within 100 and 200 dollars.
+    code:        TotalPrice BETWEEN 100 and 200
+
+    --------------------------
+    Membership Type:
+    --------------------------
+    The membership type allow you to conduct multiple match tests compactly in one statement.
+
+    pseudo-code: Find all matches for 'CEO', 'Owner', and 'President' within the contact title.
+    code:        ContactTitle IN ('CEO', 'OWNER', 'President')
+
+                 SELECT CompanyName, ContactName, ContactTitle,
+                 FROM Customers
+                 WHERE ContactTitle IN ('CEO', 'OWNER', 'President');
+
+
+-------------
+3. sort records in a particular order
+-------------
+    WHERE and ORDER BY both filter and sort a query
+
+    pseudo-code: Select contact's who are owners in 'FL' & 'TX', and order the list by name. (ASC is by default)
+    code:        SELECT CompayName, ContactName, ContactTitle
+                 FROM Customers
+                 WHERE State IN ('FL', 'TX')
+                 ORDER BY ContactName;
+
+
+-------------
+4. limit the number of records returned
+-------------
+
+    pseudo-code:
+    code:
+
+-------------
+5. group records into sections
+-------------
+    LIMIT specifies a limited number of rows in the result set to be returned. Also, with the limit option is the offset option. Offset allows you to offset the first record returned by the LIMIT clause.
+
+    LIMIT
+    pseudo-code: Select the first 5 records from the contacts table where the website is 'TechOnTheNet.com'. Sort by contact_id in descending order, and limit by 5.
+    code:        SELECT contact_id, last_name, first_name
+                 FROM contacts
+                 WHERE website = 'TechOnTheNet.com'
+                 ORDER BY contact_id DESC
+                 LIMIT 5;
+    *(This means the 5 largest contact_id values will be returned by the SELECT LIMIT statement.)
+
+    OFFSET
+    pseudo-code: Select the first 5 records from the contacts tables where the website is 'TechOnTheNet.com'. Sort by contact_id in descending order, limit by 5 and offset by 2.
+    code:        SELECT contact_id, last_name, first_name
+                 FROM contacts
+                 WHERE website = 'TechOnTheNet.com'
+                 ORDER BY contact_id DESC
+                 LIMIT 5 OFFSET 2;
+    *(This SQL SELECT LIMIT example uses an OFFSET of 2 which means that the first and second records in the result set will be skipped...and then the next 5 rows will be returned.)
+
+
+-------------
+6. perform calculations using aggregate functions
+-------------
+
+    --------------------------
+    AVG:
+    --------------------------
+    calculates the average of the values.
+      + You can specify ALL or DISTINCT modifier before the expression
+      + AVG function ignores NULL values
+
+      pseudo-code: Calculate the average of unit prices of all products in the products table.
+      code:        SELECT AVG(unitprice)
+                   FROM products;
+
+    --------------------------
+    COUNT:
+    --------------------------
+    returns the number of rows in a specified table or view.
+      + COUNT(*) returns a number of rows that includes the # of duplicates and NULL values.
+      + COUNT(DISTINCT column) returns a number of rows which excludes the # of duplicates and NULL values.
+      + COUNT(ALL column) returns a number of rows which includes the # of duplicates and excludes the # of NULL values.
+
+      pseudo-code: get the number of orders in the orders table.
+      code:        SELECT COUNT(*)
+                   FROM orders;
+
+      pseudo-code: get the number of orders by the customer's id column, GROUP BY customers, and order by the highest # of orders.
+      code:        SELECT customer_id, COUNT(*)
+                   FROM orders
+                   GROUP BY customer_id
+                   ORDER BY COUNT(*) DESC;
+
+      pseudo-code: return the number of countries except for both duplicates and NULL values.
+      code:        SELECT COUNT(DISTINCT country)
+                   FROM customers;
+
+      pseudo-code: return the number of countries except for the NULL values
+      code:        SELECT COUNT(ALL country)
+                   FROM customers;
+
+    --------------------------
+    MIN:
+    --------------------------
+    gets the minimum value in a set of values.
+
+    pseudo-code: Find the lowest price of products in the products tables.
+    code:        SELECT MIN(unitprice)
+                 FROM products;
+
+    --------------------------
+    MAX:
+    --------------------------
+    gets the maximum value in a set of values.
+
+    pseudo-code: Find the largest prict of products in the products table.
+    code:        SELECT(MAX unitprice)
+                 FROM products;
+
+    --------------------------
+    SUM:
+    --------------------------
+    calculates the sum of values.
+    You can specify either ALL or DISTINCT modifiers in the SUM() function.
+      + DISTINCT modifier instructs the SUM() function to calculate the total of distinct values, duplicates are eliminated.
+      + ALL modifier instructs the SUM() function to return the sum of all values including duplicates. 
+      + *The SUM() function uses the ALL modifier by default if you do not specify any modifier explicitly.
+
+    pseudo-code: get the sum of units in stock and the sum of units on order.
+    code:        SELECT SUM(units_in_stock), SUM(units_on_order)
+                 FROM products;
+
+    pseudo-code: get the sum of units in stock by supplier_id, and group by supplier_id.
+    code:        SELECT supplier_id, SUM(units_in_stock)
+                 FROM products
+                 GROUP BY supplier_id;
+
+
+-------------
+7. join tables using cross join, inner join, and outer join
+-------------
+
+    --------------------------
+    CROSS JOIN:
+    --------------------------
+    produces a result set in which the number of rows in the first table are multiplies by the number of rows in the second table if no WHERE clause is used. 
+     + If the WHERE clause is used, it functions like an INNER JOIN.
+
+    pseudo-code: check the attendants of members for all relevant dates
+    code:        SELECT name, date
+                 FROM memebers
+                 CROSS JOIN dates;
+
+    --------------------------
+    INNER JOIN:
+    --------------------------
+    Selects records that have matching values in both tables.
+
+    pseudo-code: select all orders with customer information
+    code:        SELECT Orders.OrderID, Customers.CustomerName
+                 FROM Orders
+                 INNER JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+
+    --------------------------
+    OUTER JOIN:
+    --------------------------
+    Returns all records when there is a match in either left (table1) or right (table2) table records.
+
+    pseudo-code: selects all customers, and all orders
+    code:        SELECT Customers.CustomerName, Orders.OrderID
+                 FROM Customers
+                 FULL OUTER JOIN Orders ON Customers.CustomerID=Orders.CustomerID
+                 ORDER BY Customers.CustomerName;
+
