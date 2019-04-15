@@ -1,0 +1,212 @@
+*******************************************************************************
+1. What's a RubyGem and why would you use one?
+  + A RubyGem is basically a plugin that you can use inside your project.
+
+*******************************************************************************
+2. What's the difference between lazy and eager loading?
+  + Lazy loading means that only the parent object is retreived. Since the child objects
+  are not loaded automatically, this means that additional queries are issued to the database.
+  With this many round trips back and forth to the database this becomes a performance issue
+  for many applications. The more queries, the slower the performance.
+
+  + Eager loading is the opposite of lazy loading in which the related objects (child objects)
+  are loaded automatically. In order for this to happen you must use Include() method.
+
+*******************************************************************************
+3. What's the difference between the CREATE TABLE and INSERT INTO SQL statements?
+  + The CREATE TABLE statement is used to create a new table in a database.
+  + The INSERT INTO statement is used to insert new records in a table.
+
+*******************************************************************************
+4. What's the difference between extend and include? When would you use one or the other?
+  + "Extend" adds class methods to an object from a module, while "include" adds instance
+  methods to an object from a module. If one wanted to change the functionality of the object
+  class itself, one would use "extend". If one only wants to change an instance of that class,
+  one would use "include."
+
+  ----------------------
+  INCLUDE
+  ----------------------
+  + Include is for adding methods to an instance of a class.
+
+    The include method is the way to “inject” code from one module into other modules or classes.
+    It helps you DRY up your code - avoid duplications. For example, if we have many classes that
+    would need same functionality we don’t have to write the same code in all of them. Instead,
+    we can define the module and include it in any classes. Then, we will have to call a new
+    instance on that Class object (to use another module's method). INCLUDE adds module’s methods
+    as instance methods.
+
+    test = TestClass.new.some_method
+
+    "-- A Common Idiom: When you include you can append both class and instance methods. The
+    reason for this is that include has a self.included hook you can use to modify the class
+    that is including a module and, to my knowledge, extend does not have a hook."
+
+  ----------------------
+  EXTEND
+  ----------------------
+  + Extend is for adding class methods.
+
+    test = TestClass.some_method
+
+
+    ----------------------
+    1a. QUESTION FOR GRADING TEACHER:
+    Another student had a *very simplified* answer (below), is this right? Am I wrong? Are we both
+    correct?
+
+    "Include is used when the methods are used to save changes, extend will only allow us to
+    add class methods from a module."
+    ---------------------
+
+*******************************************************************************
+5. In persistence.rb, why do the save methods need to be instance (vs. class) methods?
+
+  + The save methods in persistence.rb need to be instance methods because let's say you're updating
+  a piece of data you would expect to update just that instance of which it's called on, (and not
+  to update all the data).
+
+
+    ----------------------
+    1b. QUESTION FOR GRADING TEACHER:
+    Another student had a *very simplified* answer (below), is this right? Am I wrong? Are we both
+    correct?
+
+    "The save method is a manipulation and instance methods are used for manipulating or accessing
+    one particular object."
+    ----------------------
+
+    /Start Research/
+
+      In Ruby, a method provides functionality to an Object. A class method provides functionality
+      to a class itself, while an instance method provides functionality to one instance of a class.
+
+      For example:
+
+          ```
+            class Lisa
+
+              def self.foo
+                puts "I'm a class method"
+              end
+
+              def insta
+                puts "I'm an instance method"
+              end
+            end
+
+            Lisa.foo => "I'm a class method"
+            Lisa.insta => NoMethodError: undefinded method 'insta' for Lisa:Class
+
+            Lisa.new.insta => "I'm an instance method"
+            Lisa.new.foo => NoMethodError: undefinded method 'foo' for #<Lisa:0x1e820>
+          ```
+
+     Instance methods on a model should be used for logic/operations that relate to a specific instance
+     (the one on which the method is called).
+
+     Class methods are for things which don't operate on an individual instance of a model or for cases
+     where you don't have the instance available to you.
+
+    /End Research/
+
+
+*******************************************************************************
+6. Given the Jar-Jar Binks example earlier, what is the final SQL query in persistence.rb's save! method?
+    GIVEN
+      UPDATE #{self.class.table}
+      SET #{fields}
+      WHERE id = #{self.id};
+
+      INSERT INTO character (character_name, star_rating)
+      VALUES ('Jar-Jar Binks', 1);
+
+    FINAL Query
+        UPDATE character
+        SET character_name = 'Jar-Jar Binks',
+            star_rating = 1
+        WHERE id = 1;
+
+*******************************************************************************
+7. AddressBook's entries instance variable no longer returns anything. We'll fix this in a later checkpoint.
+  What changes will we need to make?
+
+  Technical Coach helped me to understand how to google this^ and that the hint was hidden in the question.
+
+  I found:
+
+  1. The only thing to persist through requests are class variables.
+  2. Instance variables stick around as long as the object exists.
+
+*******************************************************************************
+*******************************************************************************
+PROGRAMMING QUESTIONS:
+
+
+*******************************************************************************
+1. Write a Ruby method that converts snake_case to CamelCase using regular expressions (you can test them
+   on Rubular). Send your code in the submission tab.
+
+  def toCamel(scw)
+    scw.capitalize!
+    scw.gsub!(/\_[a-z]/) { |l| l.upcase }
+    scw.gsub!(/_/, ' ')
+  end
+  puts toCamel("make_it_camel_cased")
+
+*******************************************************************************
+2. Add a select method which takes an attribute and value and searches for all records that match:
+
+| ----------------------------- |
+| lib/bloc_record/selection.rb  |
+| ----------------------------- |
+| def find_by(attribute, value) |
+|  # work here                  |
+| end                           |
+| ----------------------------- |
+
+Assuming you have an AddressBook, it might get called like this:
+
+| -------------------------------------------------------------- |
+| myAddressBook = AddressBook.find_by("name", "My Address Book") |
+| -------------------------------------------------------------- |
+
+Your code should use a SELECT…WHERE SQL query and return an array of objects to the caller. Send your code
+in the submission tab.
+
+    ----------------------
+    ANSWER
+    ----------------------
+
+--------------------------------------------
+
+*** Under bloc_record > lib/selection.rb only method present is find.
+
+    def find(id)
+      row = connection.get_first_row <<-SQL
+        SELECT #{columns.join ","} FROM #{table}
+        WHERE id = #{id};
+      SQL
+
+      data = Hash[columns.zip(row)]
+      new(data)
+    end
+--------------------------------------------
+
+    def find_by(attribute, value)
+      row = connection.get_first_row <<-SQL
+      SELECT #{columns.join ","} FROM #{table}
+      WHERE #{attribute} = #{BlocRecord::Utility.sql_string(value)};
+      SQL
+    end
+
+
+
+
+
+
+
+
+
+
+
