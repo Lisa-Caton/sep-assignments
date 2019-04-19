@@ -1,0 +1,219 @@
+*******************************************************************************
+1. BlocRecord optimistically assumes only perfect user input, which means our 
+selection methods will fail if users pass us something we don't expect 
+(like -1 for id, or a string for num_records). Add input validation, errors, 
+and error handling to BlocRecord.
+
+  def create_entry
+    system "clear"
+    puts "New AddressBloc Entry"
+
+    print "Name: "
+    name = gets.chomp
+    while !(name =~ /\A[a-zA-Z]*\z/)
+        puts "\nName must be one word, and no special characters are allowed\n"
+        print: "Please re-enter your name: "
+        name = gets.chomp
+    end
+
+    print "Phone number: "
+    phone = gets.chomp
+    while !(phone =~ /^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9]
+    [02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))
+    \s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]
+    {4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$/)
+        puts "\nSlashes are not allowed please use hypens, or dots\n"
+        print "Please re-enter your phone number: "
+        phone = gets.chomp
+    end
+
+    print "Email: "
+    email = gets.chomp
+    while !(/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/)
+      puts "The email address must follow this format...\n"
+      puts "abc@def.com, xyz@abc.org etc\n"
+      print "Please re-enter your email address: "
+      email = gets.chomp
+    end
+
+    Entry.create(name: name, phone_number: phone, email: email)
+
+    system "clear"
+    puts "New entry created"
+  end
+
+  def edit_entry(entry)
+    print "Updated name: "
+    name = gets.chomp
+    while !(name =~ /\A[a-zA-Z]*\z/)
+        puts "\nName must be one word, and no special characters are allowed\n"
+        print: "Updated name: "
+        name = gets.chomp
+    end
+
+    print "Updated phone number: "
+    phone_number = gets.chomp
+    while !(phone =~ /^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|
+    [2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)
+    ?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|
+    ext\.?|extension)\s*(\d+))?$/)
+        puts "\nSlashes are not allowed please use hypens, or dots\n"
+        print "Updated phone number: "
+        phone = gets.chomp
+    end
+
+    print "Updated email: "
+    email = gets.chomp
+    while !(/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/)
+      puts "The email address must follow this format...\n"
+      puts "abc@def.com, xyz@abc.org etc\n"
+      print "Updated email address: "
+      email = gets.chomp
+    end
+
+    entry.name = name if !name.empty?
+    entry.phone_number = phone_number if !phone_number.empty?
+    entry.email = email if !email.empty?
+
+    system "clear"
+    puts "Updated entry:"
+    puts entry
+  end
+
+*******************************************************************************
+2. Using method_missing, add support for dynamic find_by_* method calls, where *
+is the name of any attribute on the model. If you implement this correctly, calls
+like: Entry.find_by_name("Jerome") and
+     Entry.find_by_phone_number("123-456-7890")
+will have identical results to:
+     Entry.find_by(:name, "Jerome") and
+     Entry.find_by(:phone_number, "123-456-7890"), respectively.
+
+
+  def method_missing(method_sym, *arguments, &block)
+    # the first argument is a Symbol, so you need to_s it if you want to pattern match
+    if method_sym.to_s =~ /^find_by_(.*)$/
+      find($1.to_sym => arguments.first)
+    else
+      super
+    end
+  end
+
+  def respond_to?(method_sym, include_private = false)
+    if method_sym.to_s =~ /^find_by_(.*)$/
+      true
+    else
+      super
+    end
+  end
+
+*******************************************************************************
+3.
+
+# Found this url!!!!
+# https://guides.rubyonrails.org/v2.3.11/active_record_querying.html
+
+---------------------------------
+Implement find_each to retrieve a batch of records and then yield each record to
+a block individually as a model. This will allow code like:
+
+  Contact.find_each do |contact|
+    contact.check_if_naughty_or_nice
+  end
+---------------------------------
+# to efficiently iterate over a large table, Active Record provides a batch
+finder method called '.find_each'
+
+# use '.find_each' because the '.each' appraoch may vary from being *under performant*
+to just plain *impossible* if the total number of rows in the table are very large!
+
+
+
+  answer:
+
+    Entry.find_each  do |entry|
+      row = connection.execute <<-SQL
+          SELECT #{columns.join ","}
+          FROM #{table}
+      SQL
+
+      row.each do |row|
+           yield(rows_to_array(rows))
+      end
+    end
+
+
+---------------------------------
+Support batch_size to specify the number of records to be retrieved in each batch:
+
+  Contact.find_each(start: 2000, batch_size: 2000) do |contact|
+    contact.check_if_naughty_or_nice
+  end
+---------------------------------
+# Behind the scene '.find_each' fetches rows in batches of 1000 and yields them 1-by-1.
+The size of the underlying batches is configurable via the :batch_size option!
+
+# Records are fetches in ASC order on the primary key. The :start option allows you to
+configure the first ID of the sequence if the lowest is not the one you need. This
+maybe useful for example, to resume an interrupted batch process if it saves the last processed ID as a checkpoint!
+
+  answer:
+
+    Entry.find_each(:batch_size => 2000, :start => 2000)  do |entry|
+      row = connection.execute <<-SQL
+          SELECT #{columns.join ","}
+          FROM #{table}
+      SQL
+
+      row.each do |row|
+           yield(rows_to_array(rows))
+      end
+    end
+
+
+---------------------------------
+Support find_in_batches to yield batches to a block as an array of models:
+
+ Contact.find_in_batches(start: 4000, batch_size: 2000) do |contacts, batch|
+  contacts.each { |contact| contact.check_if_naughty_or_nice }
+end
+---------------------------------
+# '.find_each' accepts the same options as the regular '.find' method. However, :order
+and :limit are needed internally and are not allowed to be passed explicitly.
+
+# You can work in chunks instead of row-by-row using '.find_in_batches'. This method
+is analogous to '.find_each', but it yields *arrays of models* instead.
+
+  answer:
+
+    Entry.find_in_batches(:batch_size => 2000, :start => 2000)  do |entry|
+      row = connection.execute <<-SQL
+          SELECT #{columns.join ","}
+          FROM #{table}
+      SQL
+
+      row.each do |row|
+           yield(rows_to_array(rows))
+      end
+    end
+
+
+    GRADING TEACHER QUESTION:
+     1. Is it correct for me to be using "connection.execute" over "connection.get_first_row" ?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
