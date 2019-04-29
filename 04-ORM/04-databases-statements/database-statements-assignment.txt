@@ -1,0 +1,198 @@
+******************************************************************************
+1. Entries currently have an arbitrary order. Add .order methods to BlocRecord
+   and modify AddressBloc to sort records.
+
+  Support ordering by ASC or DESC
+  Support ordering by multiple conditions:
+
+    Entry.order(:name, phone_number: :desc)
+    # or
+    Entry.order(name: :asc, phone_number: :desc)
+    # or
+    Entry.order("name ASC, phone_number DESC")
+    # or
+    Entry.order("name ASC", "phone_number DESC")
+
+
+---------------------------
+Attempt to answer (below)
+---------------------------
+
+  def order(*args)
+    if args.count > 1
+      order = args.join(",")
+    else
+      order = args.first.to_s
+    end
+
+      if (:attribute => :name || "name")
+        rows = connection.execute <<-SQL
+          SELECT *
+          FROM #{table}
+          ORDER BY #{order} ASC;
+        SQL
+
+      elsif (:attribute => :phone_number || "phone_number")
+        rows = connection.execute <<-SQL
+          SELECT *
+          FROM #{table}
+          ORDER BY #{order} DESC;
+        SQL
+      end
+
+    rows_to_array(rows)
+  end
+
+---------------------------
+Technical Coach -
+---------------------------
+
+  "It seems like your code is doing the following:
+
+  if (:attribute => :name || "name")
+  then order by the order arguments in Ascending order. Else if
+  (:attribute => :phone_number || "phone_number" )
+  then order by arguments in Descending order.
+
+  To me that doesn't seem to make sense. What I think you need to do is separate
+  out each argument and see if it includes the asc or desc flags, in which case
+  that ordering needs to happen in ascending or descending order, respectively.
+
+  Each ordering column can be ascending or descending, but you have to not mix up
+  which direction is for each order argument. So it could be ascending order for
+  names, but descending order for phone_numbers.
+
+  Also, just to be clear, I think there are probably more than just name and
+  phone_number as potential columns to be ordering by? Correct me if I"m wrong, I
+  haven't seen the database contents. So your code should work no matter what
+  column name was passed in as an argument, it should check for asc or desc after
+  each column name, and then assemble the ordering clause like so:
+
+  ORDER BY Country ASC, CustomerName DESC;
+  for example." - David Parker (thanks!)
+
+---------------------------
+Mentor -
+---------------------------
+
+  Taught me I don't have to specifically call out ASC, nor DESC. Catching the value
+  in the hash is the correct way - this makes it much more robust! - Dalibor (thanks!)
+
+---------------------------
+Actual answer (below)
+---------------------------
+
+  def order(*args)
+    if args.count > 1
+      order = []
+      args.each do |arg|
+        if arg.is_a? Hash
+         order << arg.map { |key, value| "#{key} #{value}" }.join(", ")
+        else
+         order << arg.to_s
+        end
+      end
+      order = order.join(", ")
+
+    elsif args.first.is_a? Hash
+      order = args.first.map { |key, value| "#{key} #{value}" }.join(", ")
+    else
+      order = args.first.to_s
+    end
+
+    rows = connection.execute <<-SQL
+      SELECT * FROM #{table}
+      ORDER BY #{order};
+    SQL
+
+    rows_to_array(rows)
+  end
+
+---------------------------
+SHOWING WORK:
+Repl.it (understanding solution better// broken down)
+https://repl.it/@LisaCaton/map-with-ASC-and-DESC
+---------------------------
+
+
+******************************************************************************
+2. Support nested associations with join. For example, Article.join(comments: :guest)
+   should use this SQL query:
+
+  SELECT * FROM article
+  INNER JOIN comment ON comment.article_id = article.id
+  INNER JOIN guest ON guest.comment_id = comment.id
+
+
+---------------------------
+answer
+---------------------------
+
+  def join(*args)
+    if args.count > 1
+      nested_join = []
+      args.each do |arg|
+        if arg.is_a? Hash
+          nested_join << arg.map { |arg| "#{key} #{value}" }.join(", ")
+      else
+          nested_join << arg.to_s
+      end
+    end
+    nested_join = nested_join.join(", ")
+
+    elsif args.first.is_a? Hash
+      nested_join = args.first.map { |key, value| "#{kay} #{value} }.join(", ")
+    else
+      nested_join = args.first.to_s
+    end
+
+    rows = connection.execution <--SQL
+      SELECT * FROM #{table} 
+      INNER JOIN #{nested_join[:key]} ON #{nested_join[:key]}.#{table}_id = #{table}.id
+      INNER JOIN #{nested_join[:value]} ON #{nested_join[:value]}.#{nested_join[:key]}_id = #{nested_join[:key]}.id
+    SQL
+  end
+
+******************************************************************************
+3. Write a SQL query using the professor / department / compensation data that outputs the
+   average number of vacation days by department:
+
+   department_name                average_vacation_days
+   -----------------------------  ---------------------
+   Transfiguration                2.0
+   Defence Against the Dark Arts  9.0
+   Study of Ancient Runes         8.0
+   Care of Magical Creatures      13.0
+
+  To do this, you'll need to explore the SQL documentation and other online resources. It
+  requires SQL features not covered in this checkpoint like GROUP BY and avg().
+
+---------------------------
+answer
+---------------------------
+
+SELECT department_name, AVG(vacation_days) AS average_vacation_days
+FROM professor
+JOIN department ON professor.department_id = department.id
+JOIN compensation ON professor.id = compensation.professor_id
+GROUP BY department_name;
+
+    ---------------------------
+    simplified:
+    ---------------------------
+
+    SELECT department_name, AVG(vacation_days) AS average_vacation_days
+    FROM professor AS p 
+    JOIN department AS d
+    ON p.department_id = d.id
+    JOIN compensation AS c
+    ON p.id = c.professor_id
+    GROUP BY department_name;
+
+
+
+
+
+
+
+
