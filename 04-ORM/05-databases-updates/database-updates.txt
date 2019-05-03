@@ -1,0 +1,217 @@
+
+************************************************************************
+1. Add functionality to allow #update to update multiple records:
+
+
+	*******************************************************
+	people = { 1 => { "first_name" => "David" }, 2 => { "first_name" => "Jeremy" } }
+
+    def update(*ids, updates)
+	
+      updates = BlocRecord::Utility.convert_keys(updates) # convert the non-id parameters to an array.
+      updates.delete "id"
+      updates_array = updates.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}" }
+      
+				# use map to convert updates to an array of strings where each string is in the format "KEY=VALUE"
+				# This updates the specified columns in the database.
+
+    	if ids.length  > 1
+    		where_clause = "WHERE id IN (#{[ids.join(",")]});"
+    	elsif
+    		where_clause = "WHERE id IN #{ids.first};"
+    	else 
+    		where_clause = ";"
+    	end
+
+
+      connection.execute <<-SQL
+        UPDATE #{table}
+        SET #{updates_array * ","}
+        #{where_clause}
+      SQL
+
+      true
+    end
+    
+    -----------------------
+    used Repl.it 
+    SHOWING WORK: https://repl.it/@LisaCaton/Testing-Databases-update
+    -----------------------
+
+************************************************************************
+2. Using method_missing, add support for dynamic update_* method calls, where * is the
+name of any attribute on the model. If you implement this correctly, calls like
+person.update_first_name("Jin") and person.update_last_name("Liu") will have identical
+results to person.update_attribute(:first_name, "Jin") and
+person.update_attribute(:last_name, "Liu"), respectively.
+
+-------------------
++ Grading Teacher - this was already one of our homework questions under section 3 >
+Select methods.
+-------------------
+
+  def method_missing(method_sym, *arguments, &block)
+    if method_sym.to_s =~ /^find_by_(.*)$/
+      find($1.to_sym => arguments.first)
+    else
+      super
+    end
+  end
+
+  def respond_to?(method_sym, include_private = false)
+    if method_sym.to_s =~ /^find_by_(.*)$/
+      true
+    else
+      super
+    end
+  end
+  
+************************************************************************
+3. Add a few other instance methods to BlocRecord::Collection class:
+
+take: Person.where(first_name: 'John').take;
+where: Person.where(first_name: 'John').where(last_name: 'Smith');
+not: Person.where.not(first_name: 'John');
+
+--------------------------
+.take
+--------------------------
+
+  def take(num=nil)
+		if num > 1
+			limit_clause = "LIMIT #{num}"
+		else 
+			limit_clause = ";"
+		end
+
+    rows = connection.execute <<-SQL
+      SELECT *
+      FROM #{table}
+      #{limit_clause}
+    SQL
+
+    rows_to_array(rows)
+  end
+
+				--------------------------
+				This is already in our file from class assignment:				
+				--------------------------
+
+					def take(num=1)
+						if num > 1
+							rows = connection.execute <<-SQL
+								SELECT #{columns.join ","}
+								FROM #{table}
+								ORDER BY random()
+								LIMIT #{num};
+							SQL
+
+							rows_to_array(rows)
+						else
+							take_one
+						end
+					end
+	
+--------------------------
+.where
+--------------------------
+
+def where(items)
+	where_items = items.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}" }
+	
+	connection.execute <<-SQL
+		SELECT *
+		FROM #{table}
+		WHERE "#{where_items}"
+	SQL
+	
+	true
+end
+
+			--------------------------
+			This is already in our file from class assignment:
+			--------------------------
+
+				def where(*args)
+					if args.count > 1
+						expression = args.shift
+						params = args
+					else
+						case args.first
+						when String
+							expression = args.first
+						when Hash
+							expression_hash = BlocRecord::Utility.convert_keys(args.first)
+							expression = expression_hash.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}"}.join(" and ")
+						end
+					end
+
+					sql = <<-SQL
+						SELECT #{columns.join ","}
+						FROM #{table}
+						WHERE #{expression};
+					SQL
+
+					rows = connection.execute(sql, params)
+					rows_to_array(rows)
+				end
+
+--------------------------
+.not
+--------------------------
+attempt 1:
+
+				def where(items)
+					where_items = items.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}" }
+	
+					connection.execute <<-SQL
+						SELECT *
+						FROM #{table}
+						WHERE NOT "#{where_items}"
+					SQL
+	
+					true
+				end
+				
+
+attempt 2:
+
+				def where(*args)
+					if args.count > 1
+						expression = args.shift
+						params = args
+					else
+						case args.first
+						when String
+							expression = args.first
+						when Hash
+							expression_hash = BlocRecord::Utility.convert_keys(args.first)
+							expression = expression_hash.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}"}.join(" and ")
+						end
+					end
+
+					sql = <<-SQL
+						SELECT #{columns.join ","}
+						FROM #{table}
+						WHERE NOT #{expression};
+					SQL
+
+					rows = connection.execute(sql, params)
+					rows_to_array(rows)
+				end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
