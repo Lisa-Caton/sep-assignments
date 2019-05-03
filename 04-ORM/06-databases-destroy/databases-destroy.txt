@@ -1,0 +1,138 @@
+************************************************************
+1. Update delete_entry in menu_controller.rb to use the new destroy method.
+
+  ------------------
+  FROM
+  ------------------
+
+    def delete_entry(entry)
+      address_book.entries.delete(entry)
+      puts "#{entry.name} has been deleted"
+    end
+
+  ------------------
+  TO
+  ------------------
+
+  Will it be an instance method or class method?
+
+  Instance method:
+  def delete_entry(entry)
+    address_book.entries.destroy(entry)
+    puts "#{entry.name} has been deleted"
+  end
+
+
+************************************************************
+2. In BlocRecord, support .destroy_all with String conditions:
+   Entry.destroy_all("phone_number = '999-999-9999'")
+
+  def destroy_all(conditions_hash=nil)
+
+    if conditions_hash && !conditions_hash.empty?
+      conditions_hash = BlocRecord::Utility.convert_keys(conditions_hash)
+      conditions = conditions_hash.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}" }.join(" and ")
+
+      connection.execute <<-SQL
+        DELETE FROM #{table}
+        WHERE #{conditions};
+      SQL
+    else
+        connection.execute <<-SQL
+          DELETE FROM #{table}
+        SQL
+    end
+
+    if conditions_hash.is_a? String
+      conditions = conditions_hash
+
+      connection.execute <<-SQL
+        DELETE FROM #{table}
+        WHERE #{conditions};
+      SQL
+    end
+
+    true
+  end
+
+
+
+************************************************************
+3. Support .destroy_all with Array conditions:
+   Entry.destroy_all("phone_number = ?", '999-999-9999')
+
+   def destroy_all(conditions_hash=nil)
+
+    if conditions_hash && !conditions_hash.empty?
+      conditions_hash = BlocRecord::Utility.convert_keys(conditions_hash)
+      conditions = conditions_hash.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}" }.join(" and ")
+
+      connection.execute <<-SQL
+        DELETE FROM #{table}
+        WHERE #{conditions};
+      SQL
+    else
+        connection.execute <<-SQL
+          DELETE FROM #{table}
+        SQL
+    end
+
+    if conditions_hash.is_a? Array
+      conditions = conditions_hash.join(",")
+
+      connection.execute <<-SQL
+        DELETE FROM #{table}
+        WHERE #{conditions};
+      SQL
+    end
+
+    true
+  end
+
+
+
+************************************************************
+4. Support destruction of all records on an Array of instances:
+   User.where(age: 20).destroy_all
+
+  def destroy_all(conditions_hash=nil)
+
+    if conditions_hash && !conditions_hash.empty?
+      conditions_hash = BlocRecord::Utility.convert_keys(conditions_hash)
+      conditions = conditions_hash.map { |key, value| "#{key}=#{BlocRecord::Utility.sql_strings(value)}" }.join(" and ")
+
+      connection.execute <<-SQL
+        DELETE FROM #{table}
+        WHERE #{conditions};
+      SQL
+    else
+        connection.execute <<-SQL
+          DELETE FROM #{table}
+        SQL
+    end
+
+    if conditions_hash.is_a? String
+      conditions = conditions_hash
+
+      connection.execute <<-SQL
+        DELETE FROM #{table}
+        WHERE #{conditions};
+      SQL
+
+    elsif conditions_hash.is_a? Array
+      conditions = conditions_hash.join(",")
+
+      connection.execute <<-SQL
+        DELETE FROM #{table}
+        WHERE #{conditions};
+      SQL
+
+    else 
+
+      connection.execute <<-SQL
+        DELETE FROM #{table};
+      SQL
+
+
+    true
+  end
